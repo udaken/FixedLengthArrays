@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>FixedLengthArrays</AssemblyName>
+    <RootNamespace>FixedLengthArrays</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Features>strict</Features>
+   <LangVersion>8.0</LangVersion>
+   <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+   <Authors>udaken</Authors>
+   <Company>udaken</Company>
+   <PackageProjectUrl>https://github.com/udaken/FixedLengthArrays</PackageProjectUrl>
+   <PackageId>FixedLengthArrays</PackageId>
+   <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="FixedLengthArray.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FixedLengthArray.cs</LastGenOutput>
+    </None>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="FixedLengthArray.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FixedLengthArray.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.3" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
+  </ItemGroup>
+
+</Project>
