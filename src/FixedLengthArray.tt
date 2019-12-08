@@ -25,7 +25,7 @@ using System.Runtime.CompilerServices;
 
 namespace FixedLengthArray
 {
-<#foreach((var Type,var i) in 
+<#foreach((var elementType,var length) in 
 	Enumerable.Range(2,64)
 	.Append(96)
 	.Append(128)
@@ -33,47 +33,49 @@ namespace FixedLengthArray
 	.Append(256)
 	.Append(260)
 	.Append(384)
-	.Append(512).Select(elem => (Type: "Byte", Count: elem))
-	.Concat(Enumerable.Range(2,64+1).Append(260).Select(elem => (Type: "Char", Count: elem)))
-	.Concat(new []{2,4,8,16,32}.Select(elem => (Type: "UInt32", Count: elem)))
+	.Append(512).Select(elem => (elementType: "Byte", Count: elem))
+	.Concat(Enumerable.Range(2,64+1).Append(260).Select(elem => (elementType: "Char", Count: elem)))
+	.Concat(new []{2,4,8,16,32}.Select(elem => (elementType: "UInt32", Count: elem)))
 
 	) {
+	var generatedTypeName = "FixedLength" + elementType + "Array" + length;
 #>
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = <#=i#> * sizeof(<#=Type#>))]
-	public struct FixedLength<#=Type#>Array<#=i#>
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = <#=length#> * sizeof(<#=elementType#>), CharSet = CharSet.Unicode)]
+	public struct <#=generatedTypeName#>
 #if GENERATE_ENUMERABLE
-		: IEnumerable<<#=Type#>>
+		: IEnumerable<<#=elementType#>>
 #endif
 	{
-		private static readonly FixedLength<#=Type#>Array<#=i#> _Zero = new FixedLength<#=Type#>Array<#=i#>();
-		public static ref readonly FixedLength<#=Type#>Array<#=i#> RefToZero => ref _Zero;
+		private static readonly <#=generatedTypeName#> _Zero = default;
+		public static ref readonly <#=generatedTypeName#> Zero => ref _Zero;
 
-		public readonly int Length => <#=i#>;
+		public const int ConstLength = <#=length#>;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
-		public FixedLength<#=Type#>Array<#=i#>(
-			<#=Type#> field0
-<#for(var j = 1; j < i; j++){#>
-			, <#=Type#> field<#=j#>
+		public <#=generatedTypeName#>(
+			<#=elementType#> field0
+<#for(var j = 1; j < length; j++){#>
+			, <#=elementType#> field<#=j#>
 <#}#>
 		)
 		{
-<#for(var j = 0; j < i; j++){#>
+<#for(var j = 0; j < length; j++){#>
 			Field<#=j#> = field<#=j#>;
 <#}#>
 		}
 #endif
-		public <#=Type#> Field0;
+		public <#=elementType#> Field0;
 #if GENERATE_ALL_FIELDS
-<#for(var j = 1; j < i; j++){#>
-		public <#=Type#> Field<#=j#>;
+<#for(var j = 1; j < length; j++){#>
+		public <#=elementType#> Field<#=j#>;
 <#}#>
 #endif
-        public <#=Type#> this[int index]
+        public <#=elementType#> this[int index]
         {
 #if GENERATE_ALL_FIELDS
             readonly get => index switch
             {
-<#for(var j = 0; j < i; j++){#>
+<#for(var j = 0; j < length; j++){#>
                 <#=j#> => Field<#=j#>,
 <#}#>
                 _ => throw new ArgumentOutOfRangeException(nameof(index)),
@@ -82,15 +84,15 @@ namespace FixedLengthArray
             {
                 switch (index)
                 {
-<#for(var j = 0; j < i; j++){#>
+<#for(var j = 0; j < length; j++){#>
                     case <#=j#>: Field<#=j#> = value; break;
 <#}#>
 					default: throw new ArgumentOutOfRangeException(nameof(index));
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -100,23 +102,23 @@ namespace FixedLengthArray
         }
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
-            => other is null || !(other is FixedLength<#=Type#>Array<#=i#>) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLength<#=Type#>Array<#=i#>)other);
+            => other is null || !(other is <#=generatedTypeName#>) ? false :
+			   FixedLengthArrayExtension.Equals(in this, (<#=generatedTypeName#>)other);
 
-        public readonly bool Equals(in FixedLength<#=Type#>Array<#=i#> other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+        public readonly bool Equals(in <#=generatedTypeName#> other)
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
-        public static bool operator ==(in FixedLength<#=Type#>Array<#=i#> left, in FixedLength<#=Type#>Array<#=i#> right)
+        public static bool operator ==(in <#=generatedTypeName#> left, in <#=generatedTypeName#> right)
             => left.Equals(right);
 
-        public static bool operator !=(in FixedLength<#=Type#>Array<#=i#> left, in FixedLength<#=Type#>Array<#=i#> right)
+        public static bool operator !=(in <#=generatedTypeName#> left, in <#=generatedTypeName#> right)
             => !(left == right);
 #endif
 
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -137,38 +139,50 @@ namespace FixedLengthArray
 #endif
 
 #if GENERATE_ENUMERABLE
-		readonly IEnumerator<<#=Type#>> IEnumerable<<#=Type#>>.GetEnumerator()
+		readonly IEnumerator<<#=elementType#>> IEnumerable<<#=elementType#>>.GetEnumerator()
 		{
-<#for(var j = 0; j < i; j++){#>
+<#for(var j = 0; j < length; j++){#>
               yield return Field<#=j#>;
 <#}#>
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-			=> ((IEnumerable<<#=Type#>>)this).GetEnumerator();
-
+			=> ((IEnumerable<<#=elementType#>>)this).GetEnumerator();
 #endif
 
 #if GENERATE_ASSPAN
-		public readonly ReadOnlySpan<<#=Type#>>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+		public readonly ReadOnlySpan<<#=elementType#>>.Enumerator GetEnumerator()
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<<#=elementType#>>(in <#=generatedTypeName#> self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<<#=elementType#>> AsSpan(this ref <#=generatedTypeName#> array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<<#=elementType#>> AsReadOnlySpan(this in <#=generatedTypeName#> array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
-        public static ref <#=Type#> At(this ref FixedLength<#=Type#>Array<#=i#> array, int index)
+        public static ref <#=elementType#> At(this ref <#=generatedTypeName#> array, int index)
         {
             switch (index)
             {
-<#for(var j = 0; j < i; j++){#>
+<#for(var j = 0; j < length; j++){#>
                 case <#=j#>: return ref array.Field<#=j#>;
 <#}#>
 				default: throw new ArgumentOutOfRangeException(nameof(index));
             }
         }
-        public static int CompareTo(this in FixedLength<#=Type#>Array<#=i#> array1, in FixedLength<#=Type#>Array<#=i#> array2)
+        public static int CompareTo(this in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
 		{
 			for(int i = 0; i < array1.Length;i++ )
 			{
@@ -178,14 +192,14 @@ namespace FixedLengthArray
 			}
 			return 0;
 		}
-        public static void CopyTo(this in FixedLength<#=Type#>Array<#=i#> array, <#=Type#>[] dest, int offset = 0)
+        public static void CopyTo(this in <#=generatedTypeName#> array, <#=elementType#>[] dest, int offset = 0)
         {
             for(int i = 0; i < array.Length;i++ )
 			{
 				dest[offset + i] = array[i];
 			}
         }
-        public static bool Equals(in FixedLength<#=Type#>Array<#=i#> array1, in FixedLength<#=Type#>Array<#=i#> array2)
+        public static bool Equals(in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
 		{
 			for(int i = 0; i < array1.Length;i++ )
 			{
@@ -194,7 +208,7 @@ namespace FixedLengthArray
 			}
 			return true;
 		}
-        public static void Fill(this ref FixedLength<#=Type#>Array<#=i#> array, <#=Type#> value = default)
+        public static void Fill(this ref <#=generatedTypeName#> array, <#=elementType#> value = default)
         {
 			for(int i = 0; i < array.Length;i++ )
 			{
@@ -203,29 +217,20 @@ namespace FixedLengthArray
         }
 #elif GENERATE_ASSPAN
 		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ref <#=Type#> At(this ref FixedLength<#=Type#>Array<#=i#> array, int index)
+        public static ref <#=elementType#> At(this ref <#=generatedTypeName#> array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<<#=Type#>> AsSpan(this ref FixedLength<#=Type#>Array<#=i#> array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<<#=Type#>> AsReadOnlySpan(this in FixedLength<#=Type#>Array<#=i#> array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
-        public static int CompareTo(this in FixedLength<#=Type#>Array<#=i#> array1, in FixedLength<#=Type#>Array<#=i#> array2)
+        public static int CompareTo(this in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
-        public static void CopyTo(this in FixedLength<#=Type#>Array<#=i#> array, Span<<#=Type#>> destination)
+        public static void CopyTo(this in <#=generatedTypeName#> array, Span<<#=elementType#>> destination)
             => AsReadOnlySpan(array).CopyTo(destination);
 
-        public static bool Equals(in FixedLength<#=Type#>Array<#=i#> array1, in FixedLength<#=Type#>Array<#=i#> array2)
+        public static bool Equals(in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
 			=> AsReadOnlySpan(array1).SequenceEqual(AsReadOnlySpan(array2));
 
-        public static void Fill(this ref FixedLength<#=Type#>Array<#=i#> array, <#=Type#> value = default)
+        public static void Fill(this ref <#=generatedTypeName#> array, <#=elementType#> value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
 <#}#>

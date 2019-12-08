@@ -19,16 +19,17 @@ using System.Runtime.CompilerServices;
 
 namespace FixedLengthArray
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray2
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray2 _Zero = new FixedLengthByteArray2();
-		public static ref readonly FixedLengthByteArray2 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray2 _Zero = default;
+		public static ref readonly FixedLengthByteArray2 Zero => ref _Zero;
 
-		public readonly int Length => 2;
+		public const int ConstLength = 2;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray2(
 			Byte field0
@@ -62,8 +63,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -74,10 +75,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray2) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray2)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray2)other);
 
         public readonly bool Equals(in FixedLengthByteArray2 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray2 left, in FixedLengthByteArray2 right)
             => left.Equals(right);
@@ -89,7 +90,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -118,17 +119,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray2 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray2 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray2 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray2 array, int index)
         {
@@ -177,14 +190,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray2 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray2 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray2 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray2 array1, in FixedLengthByteArray2 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -196,19 +201,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray2 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray3
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray3 _Zero = new FixedLengthByteArray3();
-		public static ref readonly FixedLengthByteArray3 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray3 _Zero = default;
+		public static ref readonly FixedLengthByteArray3 Zero => ref _Zero;
 
-		public readonly int Length => 3;
+		public const int ConstLength = 3;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray3(
 			Byte field0
@@ -247,8 +252,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -259,10 +264,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray3) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray3)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray3)other);
 
         public readonly bool Equals(in FixedLengthByteArray3 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray3 left, in FixedLengthByteArray3 right)
             => left.Equals(right);
@@ -274,7 +279,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -304,17 +309,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray3 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray3 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray3 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray3 array, int index)
         {
@@ -364,14 +381,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray3 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray3 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray3 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray3 array1, in FixedLengthByteArray3 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -383,19 +392,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray3 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray4
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray4 _Zero = new FixedLengthByteArray4();
-		public static ref readonly FixedLengthByteArray4 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray4 _Zero = default;
+		public static ref readonly FixedLengthByteArray4 Zero => ref _Zero;
 
-		public readonly int Length => 4;
+		public const int ConstLength = 4;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray4(
 			Byte field0
@@ -439,8 +448,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -451,10 +460,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray4) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray4)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray4)other);
 
         public readonly bool Equals(in FixedLengthByteArray4 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray4 left, in FixedLengthByteArray4 right)
             => left.Equals(right);
@@ -466,7 +475,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -497,17 +506,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray4 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray4 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray4 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray4 array, int index)
         {
@@ -558,14 +579,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray4 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray4 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray4 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray4 array1, in FixedLengthByteArray4 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -577,19 +590,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray4 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 5 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 5 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray5
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray5 _Zero = new FixedLengthByteArray5();
-		public static ref readonly FixedLengthByteArray5 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray5 _Zero = default;
+		public static ref readonly FixedLengthByteArray5 Zero => ref _Zero;
 
-		public readonly int Length => 5;
+		public const int ConstLength = 5;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray5(
 			Byte field0
@@ -638,8 +651,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -650,10 +663,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray5) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray5)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray5)other);
 
         public readonly bool Equals(in FixedLengthByteArray5 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray5 left, in FixedLengthByteArray5 right)
             => left.Equals(right);
@@ -665,7 +678,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -697,17 +710,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray5 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray5 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray5 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray5 array, int index)
         {
@@ -759,14 +784,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray5 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray5 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray5 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray5 array1, in FixedLengthByteArray5 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -778,19 +795,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray5 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 6 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 6 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray6
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray6 _Zero = new FixedLengthByteArray6();
-		public static ref readonly FixedLengthByteArray6 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray6 _Zero = default;
+		public static ref readonly FixedLengthByteArray6 Zero => ref _Zero;
 
-		public readonly int Length => 6;
+		public const int ConstLength = 6;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray6(
 			Byte field0
@@ -844,8 +861,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -856,10 +873,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray6) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray6)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray6)other);
 
         public readonly bool Equals(in FixedLengthByteArray6 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray6 left, in FixedLengthByteArray6 right)
             => left.Equals(right);
@@ -871,7 +888,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -904,17 +921,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray6 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray6 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray6 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray6 array, int index)
         {
@@ -967,14 +996,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray6 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray6 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray6 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray6 array1, in FixedLengthByteArray6 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -986,19 +1007,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray6 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 7 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 7 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray7
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray7 _Zero = new FixedLengthByteArray7();
-		public static ref readonly FixedLengthByteArray7 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray7 _Zero = default;
+		public static ref readonly FixedLengthByteArray7 Zero => ref _Zero;
 
-		public readonly int Length => 7;
+		public const int ConstLength = 7;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray7(
 			Byte field0
@@ -1057,8 +1078,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -1069,10 +1090,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray7) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray7)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray7)other);
 
         public readonly bool Equals(in FixedLengthByteArray7 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray7 left, in FixedLengthByteArray7 right)
             => left.Equals(right);
@@ -1084,7 +1105,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -1118,17 +1139,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray7 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray7 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray7 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray7 array, int index)
         {
@@ -1182,14 +1215,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray7 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray7 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray7 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray7 array1, in FixedLengthByteArray7 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -1201,19 +1226,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray7 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray8
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray8 _Zero = new FixedLengthByteArray8();
-		public static ref readonly FixedLengthByteArray8 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray8 _Zero = default;
+		public static ref readonly FixedLengthByteArray8 Zero => ref _Zero;
 
-		public readonly int Length => 8;
+		public const int ConstLength = 8;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray8(
 			Byte field0
@@ -1277,8 +1302,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -1289,10 +1314,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray8) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray8)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray8)other);
 
         public readonly bool Equals(in FixedLengthByteArray8 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray8 left, in FixedLengthByteArray8 right)
             => left.Equals(right);
@@ -1304,7 +1329,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -1339,17 +1364,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray8 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray8 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray8 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray8 array, int index)
         {
@@ -1404,14 +1441,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray8 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray8 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray8 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray8 array1, in FixedLengthByteArray8 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -1423,19 +1452,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray8 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 9 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 9 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray9
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray9 _Zero = new FixedLengthByteArray9();
-		public static ref readonly FixedLengthByteArray9 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray9 _Zero = default;
+		public static ref readonly FixedLengthByteArray9 Zero => ref _Zero;
 
-		public readonly int Length => 9;
+		public const int ConstLength = 9;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray9(
 			Byte field0
@@ -1504,8 +1533,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -1516,10 +1545,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray9) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray9)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray9)other);
 
         public readonly bool Equals(in FixedLengthByteArray9 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray9 left, in FixedLengthByteArray9 right)
             => left.Equals(right);
@@ -1531,7 +1560,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -1567,17 +1596,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray9 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray9 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray9 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray9 array, int index)
         {
@@ -1633,14 +1674,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray9 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray9 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray9 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray9 array1, in FixedLengthByteArray9 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -1652,19 +1685,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray9 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray10
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray10 _Zero = new FixedLengthByteArray10();
-		public static ref readonly FixedLengthByteArray10 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray10 _Zero = default;
+		public static ref readonly FixedLengthByteArray10 Zero => ref _Zero;
 
-		public readonly int Length => 10;
+		public const int ConstLength = 10;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray10(
 			Byte field0
@@ -1738,8 +1771,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -1750,10 +1783,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray10) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray10)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray10)other);
 
         public readonly bool Equals(in FixedLengthByteArray10 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray10 left, in FixedLengthByteArray10 right)
             => left.Equals(right);
@@ -1765,7 +1798,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -1802,17 +1835,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray10 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray10 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray10 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray10 array, int index)
         {
@@ -1869,14 +1914,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray10 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray10 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray10 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray10 array1, in FixedLengthByteArray10 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -1888,19 +1925,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray10 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 11 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 11 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray11
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray11 _Zero = new FixedLengthByteArray11();
-		public static ref readonly FixedLengthByteArray11 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray11 _Zero = default;
+		public static ref readonly FixedLengthByteArray11 Zero => ref _Zero;
 
-		public readonly int Length => 11;
+		public const int ConstLength = 11;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray11(
 			Byte field0
@@ -1979,8 +2016,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -1991,10 +2028,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray11) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray11)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray11)other);
 
         public readonly bool Equals(in FixedLengthByteArray11 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray11 left, in FixedLengthByteArray11 right)
             => left.Equals(right);
@@ -2006,7 +2043,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -2044,17 +2081,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray11 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray11 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray11 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray11 array, int index)
         {
@@ -2112,14 +2161,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray11 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray11 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray11 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray11 array1, in FixedLengthByteArray11 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -2131,19 +2172,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray11 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray12
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray12 _Zero = new FixedLengthByteArray12();
-		public static ref readonly FixedLengthByteArray12 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray12 _Zero = default;
+		public static ref readonly FixedLengthByteArray12 Zero => ref _Zero;
 
-		public readonly int Length => 12;
+		public const int ConstLength = 12;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray12(
 			Byte field0
@@ -2227,8 +2268,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -2239,10 +2280,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray12) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray12)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray12)other);
 
         public readonly bool Equals(in FixedLengthByteArray12 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray12 left, in FixedLengthByteArray12 right)
             => left.Equals(right);
@@ -2254,7 +2295,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -2293,17 +2334,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray12 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray12 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray12 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray12 array, int index)
         {
@@ -2362,14 +2415,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray12 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray12 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray12 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray12 array1, in FixedLengthByteArray12 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -2381,19 +2426,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray12 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 13 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 13 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray13
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray13 _Zero = new FixedLengthByteArray13();
-		public static ref readonly FixedLengthByteArray13 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray13 _Zero = default;
+		public static ref readonly FixedLengthByteArray13 Zero => ref _Zero;
 
-		public readonly int Length => 13;
+		public const int ConstLength = 13;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray13(
 			Byte field0
@@ -2482,8 +2527,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -2494,10 +2539,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray13) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray13)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray13)other);
 
         public readonly bool Equals(in FixedLengthByteArray13 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray13 left, in FixedLengthByteArray13 right)
             => left.Equals(right);
@@ -2509,7 +2554,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -2549,17 +2594,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray13 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray13 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray13 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray13 array, int index)
         {
@@ -2619,14 +2676,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray13 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray13 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray13 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray13 array1, in FixedLengthByteArray13 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -2638,19 +2687,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray13 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 14 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 14 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray14
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray14 _Zero = new FixedLengthByteArray14();
-		public static ref readonly FixedLengthByteArray14 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray14 _Zero = default;
+		public static ref readonly FixedLengthByteArray14 Zero => ref _Zero;
 
-		public readonly int Length => 14;
+		public const int ConstLength = 14;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray14(
 			Byte field0
@@ -2744,8 +2793,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -2756,10 +2805,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray14) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray14)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray14)other);
 
         public readonly bool Equals(in FixedLengthByteArray14 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray14 left, in FixedLengthByteArray14 right)
             => left.Equals(right);
@@ -2771,7 +2820,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -2812,17 +2861,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray14 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray14 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray14 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray14 array, int index)
         {
@@ -2883,14 +2944,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray14 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray14 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray14 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray14 array1, in FixedLengthByteArray14 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -2902,19 +2955,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray14 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 15 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 15 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray15
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray15 _Zero = new FixedLengthByteArray15();
-		public static ref readonly FixedLengthByteArray15 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray15 _Zero = default;
+		public static ref readonly FixedLengthByteArray15 Zero => ref _Zero;
 
-		public readonly int Length => 15;
+		public const int ConstLength = 15;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray15(
 			Byte field0
@@ -3013,8 +3066,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -3025,10 +3078,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray15) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray15)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray15)other);
 
         public readonly bool Equals(in FixedLengthByteArray15 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray15 left, in FixedLengthByteArray15 right)
             => left.Equals(right);
@@ -3040,7 +3093,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -3082,17 +3135,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray15 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray15 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray15 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray15 array, int index)
         {
@@ -3154,14 +3219,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray15 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray15 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray15 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray15 array1, in FixedLengthByteArray15 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -3173,19 +3230,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray15 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray16
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray16 _Zero = new FixedLengthByteArray16();
-		public static ref readonly FixedLengthByteArray16 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray16 _Zero = default;
+		public static ref readonly FixedLengthByteArray16 Zero => ref _Zero;
 
-		public readonly int Length => 16;
+		public const int ConstLength = 16;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray16(
 			Byte field0
@@ -3289,8 +3346,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -3301,10 +3358,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray16) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray16)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray16)other);
 
         public readonly bool Equals(in FixedLengthByteArray16 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray16 left, in FixedLengthByteArray16 right)
             => left.Equals(right);
@@ -3316,7 +3373,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -3359,17 +3416,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray16 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray16 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray16 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray16 array, int index)
         {
@@ -3432,14 +3501,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray16 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray16 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray16 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray16 array1, in FixedLengthByteArray16 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -3451,19 +3512,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray16 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 17 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 17 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray17
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray17 _Zero = new FixedLengthByteArray17();
-		public static ref readonly FixedLengthByteArray17 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray17 _Zero = default;
+		public static ref readonly FixedLengthByteArray17 Zero => ref _Zero;
 
-		public readonly int Length => 17;
+		public const int ConstLength = 17;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray17(
 			Byte field0
@@ -3572,8 +3633,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -3584,10 +3645,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray17) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray17)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray17)other);
 
         public readonly bool Equals(in FixedLengthByteArray17 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray17 left, in FixedLengthByteArray17 right)
             => left.Equals(right);
@@ -3599,7 +3660,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -3643,17 +3704,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray17 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray17 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray17 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray17 array, int index)
         {
@@ -3717,14 +3790,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray17 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray17 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray17 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray17 array1, in FixedLengthByteArray17 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -3736,19 +3801,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray17 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 18 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 18 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray18
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray18 _Zero = new FixedLengthByteArray18();
-		public static ref readonly FixedLengthByteArray18 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray18 _Zero = default;
+		public static ref readonly FixedLengthByteArray18 Zero => ref _Zero;
 
-		public readonly int Length => 18;
+		public const int ConstLength = 18;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray18(
 			Byte field0
@@ -3862,8 +3927,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -3874,10 +3939,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray18) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray18)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray18)other);
 
         public readonly bool Equals(in FixedLengthByteArray18 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray18 left, in FixedLengthByteArray18 right)
             => left.Equals(right);
@@ -3889,7 +3954,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -3934,17 +3999,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray18 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray18 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray18 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray18 array, int index)
         {
@@ -4009,14 +4086,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray18 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray18 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray18 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray18 array1, in FixedLengthByteArray18 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -4028,19 +4097,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray18 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 19 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 19 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray19
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray19 _Zero = new FixedLengthByteArray19();
-		public static ref readonly FixedLengthByteArray19 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray19 _Zero = default;
+		public static ref readonly FixedLengthByteArray19 Zero => ref _Zero;
 
-		public readonly int Length => 19;
+		public const int ConstLength = 19;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray19(
 			Byte field0
@@ -4159,8 +4228,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -4171,10 +4240,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray19) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray19)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray19)other);
 
         public readonly bool Equals(in FixedLengthByteArray19 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray19 left, in FixedLengthByteArray19 right)
             => left.Equals(right);
@@ -4186,7 +4255,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -4232,17 +4301,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray19 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray19 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray19 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray19 array, int index)
         {
@@ -4308,14 +4389,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray19 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray19 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray19 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray19 array1, in FixedLengthByteArray19 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -4327,19 +4400,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray19 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 20 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 20 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray20
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray20 _Zero = new FixedLengthByteArray20();
-		public static ref readonly FixedLengthByteArray20 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray20 _Zero = default;
+		public static ref readonly FixedLengthByteArray20 Zero => ref _Zero;
 
-		public readonly int Length => 20;
+		public const int ConstLength = 20;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray20(
 			Byte field0
@@ -4463,8 +4536,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -4475,10 +4548,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray20) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray20)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray20)other);
 
         public readonly bool Equals(in FixedLengthByteArray20 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray20 left, in FixedLengthByteArray20 right)
             => left.Equals(right);
@@ -4490,7 +4563,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -4537,17 +4610,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray20 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray20 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray20 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray20 array, int index)
         {
@@ -4614,14 +4699,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray20 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray20 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray20 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray20 array1, in FixedLengthByteArray20 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -4633,19 +4710,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray20 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 21 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 21 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray21
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray21 _Zero = new FixedLengthByteArray21();
-		public static ref readonly FixedLengthByteArray21 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray21 _Zero = default;
+		public static ref readonly FixedLengthByteArray21 Zero => ref _Zero;
 
-		public readonly int Length => 21;
+		public const int ConstLength = 21;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray21(
 			Byte field0
@@ -4774,8 +4851,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -4786,10 +4863,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray21) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray21)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray21)other);
 
         public readonly bool Equals(in FixedLengthByteArray21 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray21 left, in FixedLengthByteArray21 right)
             => left.Equals(right);
@@ -4801,7 +4878,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -4849,17 +4926,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray21 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray21 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray21 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray21 array, int index)
         {
@@ -4927,14 +5016,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray21 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray21 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray21 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray21 array1, in FixedLengthByteArray21 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -4946,19 +5027,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray21 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 22 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 22 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray22
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray22 _Zero = new FixedLengthByteArray22();
-		public static ref readonly FixedLengthByteArray22 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray22 _Zero = default;
+		public static ref readonly FixedLengthByteArray22 Zero => ref _Zero;
 
-		public readonly int Length => 22;
+		public const int ConstLength = 22;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray22(
 			Byte field0
@@ -5092,8 +5173,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -5104,10 +5185,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray22) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray22)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray22)other);
 
         public readonly bool Equals(in FixedLengthByteArray22 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray22 left, in FixedLengthByteArray22 right)
             => left.Equals(right);
@@ -5119,7 +5200,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -5168,17 +5249,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray22 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray22 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray22 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray22 array, int index)
         {
@@ -5247,14 +5340,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray22 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray22 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray22 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray22 array1, in FixedLengthByteArray22 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -5266,19 +5351,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray22 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 23 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 23 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray23
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray23 _Zero = new FixedLengthByteArray23();
-		public static ref readonly FixedLengthByteArray23 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray23 _Zero = default;
+		public static ref readonly FixedLengthByteArray23 Zero => ref _Zero;
 
-		public readonly int Length => 23;
+		public const int ConstLength = 23;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray23(
 			Byte field0
@@ -5417,8 +5502,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -5429,10 +5514,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray23) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray23)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray23)other);
 
         public readonly bool Equals(in FixedLengthByteArray23 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray23 left, in FixedLengthByteArray23 right)
             => left.Equals(right);
@@ -5444,7 +5529,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -5494,17 +5579,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray23 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray23 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray23 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray23 array, int index)
         {
@@ -5574,14 +5671,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray23 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray23 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray23 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray23 array1, in FixedLengthByteArray23 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -5593,19 +5682,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray23 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 24 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 24 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray24
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray24 _Zero = new FixedLengthByteArray24();
-		public static ref readonly FixedLengthByteArray24 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray24 _Zero = default;
+		public static ref readonly FixedLengthByteArray24 Zero => ref _Zero;
 
-		public readonly int Length => 24;
+		public const int ConstLength = 24;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray24(
 			Byte field0
@@ -5749,8 +5838,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -5761,10 +5850,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray24) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray24)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray24)other);
 
         public readonly bool Equals(in FixedLengthByteArray24 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray24 left, in FixedLengthByteArray24 right)
             => left.Equals(right);
@@ -5776,7 +5865,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -5827,17 +5916,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray24 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray24 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray24 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray24 array, int index)
         {
@@ -5908,14 +6009,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray24 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray24 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray24 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray24 array1, in FixedLengthByteArray24 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -5927,19 +6020,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray24 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 25 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 25 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray25
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray25 _Zero = new FixedLengthByteArray25();
-		public static ref readonly FixedLengthByteArray25 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray25 _Zero = default;
+		public static ref readonly FixedLengthByteArray25 Zero => ref _Zero;
 
-		public readonly int Length => 25;
+		public const int ConstLength = 25;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray25(
 			Byte field0
@@ -6088,8 +6181,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -6100,10 +6193,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray25) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray25)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray25)other);
 
         public readonly bool Equals(in FixedLengthByteArray25 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray25 left, in FixedLengthByteArray25 right)
             => left.Equals(right);
@@ -6115,7 +6208,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -6167,17 +6260,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray25 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray25 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray25 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray25 array, int index)
         {
@@ -6249,14 +6354,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray25 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray25 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray25 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray25 array1, in FixedLengthByteArray25 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -6268,19 +6365,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray25 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 26 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 26 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray26
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray26 _Zero = new FixedLengthByteArray26();
-		public static ref readonly FixedLengthByteArray26 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray26 _Zero = default;
+		public static ref readonly FixedLengthByteArray26 Zero => ref _Zero;
 
-		public readonly int Length => 26;
+		public const int ConstLength = 26;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray26(
 			Byte field0
@@ -6434,8 +6531,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -6446,10 +6543,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray26) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray26)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray26)other);
 
         public readonly bool Equals(in FixedLengthByteArray26 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray26 left, in FixedLengthByteArray26 right)
             => left.Equals(right);
@@ -6461,7 +6558,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -6514,17 +6611,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray26 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray26 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray26 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray26 array, int index)
         {
@@ -6597,14 +6706,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray26 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray26 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray26 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray26 array1, in FixedLengthByteArray26 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -6616,19 +6717,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray26 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 27 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 27 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray27
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray27 _Zero = new FixedLengthByteArray27();
-		public static ref readonly FixedLengthByteArray27 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray27 _Zero = default;
+		public static ref readonly FixedLengthByteArray27 Zero => ref _Zero;
 
-		public readonly int Length => 27;
+		public const int ConstLength = 27;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray27(
 			Byte field0
@@ -6787,8 +6888,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -6799,10 +6900,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray27) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray27)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray27)other);
 
         public readonly bool Equals(in FixedLengthByteArray27 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray27 left, in FixedLengthByteArray27 right)
             => left.Equals(right);
@@ -6814,7 +6915,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -6868,17 +6969,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray27 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray27 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray27 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray27 array, int index)
         {
@@ -6952,14 +7065,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray27 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray27 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray27 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray27 array1, in FixedLengthByteArray27 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -6971,19 +7076,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray27 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 28 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 28 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray28
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray28 _Zero = new FixedLengthByteArray28();
-		public static ref readonly FixedLengthByteArray28 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray28 _Zero = default;
+		public static ref readonly FixedLengthByteArray28 Zero => ref _Zero;
 
-		public readonly int Length => 28;
+		public const int ConstLength = 28;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray28(
 			Byte field0
@@ -7147,8 +7252,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -7159,10 +7264,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray28) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray28)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray28)other);
 
         public readonly bool Equals(in FixedLengthByteArray28 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray28 left, in FixedLengthByteArray28 right)
             => left.Equals(right);
@@ -7174,7 +7279,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -7229,17 +7334,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray28 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray28 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray28 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray28 array, int index)
         {
@@ -7314,14 +7431,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray28 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray28 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray28 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray28 array1, in FixedLengthByteArray28 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -7333,19 +7442,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray28 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 29 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 29 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray29
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray29 _Zero = new FixedLengthByteArray29();
-		public static ref readonly FixedLengthByteArray29 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray29 _Zero = default;
+		public static ref readonly FixedLengthByteArray29 Zero => ref _Zero;
 
-		public readonly int Length => 29;
+		public const int ConstLength = 29;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray29(
 			Byte field0
@@ -7514,8 +7623,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -7526,10 +7635,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray29) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray29)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray29)other);
 
         public readonly bool Equals(in FixedLengthByteArray29 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray29 left, in FixedLengthByteArray29 right)
             => left.Equals(right);
@@ -7541,7 +7650,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -7597,17 +7706,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray29 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray29 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray29 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray29 array, int index)
         {
@@ -7683,14 +7804,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray29 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray29 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray29 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray29 array1, in FixedLengthByteArray29 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -7702,19 +7815,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray29 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 30 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 30 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray30
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray30 _Zero = new FixedLengthByteArray30();
-		public static ref readonly FixedLengthByteArray30 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray30 _Zero = default;
+		public static ref readonly FixedLengthByteArray30 Zero => ref _Zero;
 
-		public readonly int Length => 30;
+		public const int ConstLength = 30;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray30(
 			Byte field0
@@ -7888,8 +8001,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -7900,10 +8013,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray30) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray30)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray30)other);
 
         public readonly bool Equals(in FixedLengthByteArray30 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray30 left, in FixedLengthByteArray30 right)
             => left.Equals(right);
@@ -7915,7 +8028,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -7972,17 +8085,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray30 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray30 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray30 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray30 array, int index)
         {
@@ -8059,14 +8184,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray30 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray30 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray30 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray30 array1, in FixedLengthByteArray30 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -8078,19 +8195,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray30 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 31 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 31 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray31
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray31 _Zero = new FixedLengthByteArray31();
-		public static ref readonly FixedLengthByteArray31 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray31 _Zero = default;
+		public static ref readonly FixedLengthByteArray31 Zero => ref _Zero;
 
-		public readonly int Length => 31;
+		public const int ConstLength = 31;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray31(
 			Byte field0
@@ -8269,8 +8386,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -8281,10 +8398,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray31) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray31)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray31)other);
 
         public readonly bool Equals(in FixedLengthByteArray31 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray31 left, in FixedLengthByteArray31 right)
             => left.Equals(right);
@@ -8296,7 +8413,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -8354,17 +8471,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray31 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray31 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray31 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray31 array, int index)
         {
@@ -8442,14 +8571,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray31 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray31 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray31 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray31 array1, in FixedLengthByteArray31 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -8461,19 +8582,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray31 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray32
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray32 _Zero = new FixedLengthByteArray32();
-		public static ref readonly FixedLengthByteArray32 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray32 _Zero = default;
+		public static ref readonly FixedLengthByteArray32 Zero => ref _Zero;
 
-		public readonly int Length => 32;
+		public const int ConstLength = 32;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray32(
 			Byte field0
@@ -8657,8 +8778,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -8669,10 +8790,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray32) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray32)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray32)other);
 
         public readonly bool Equals(in FixedLengthByteArray32 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray32 left, in FixedLengthByteArray32 right)
             => left.Equals(right);
@@ -8684,7 +8805,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -8743,17 +8864,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray32 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray32 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray32 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray32 array, int index)
         {
@@ -8832,14 +8965,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray32 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray32 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray32 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray32 array1, in FixedLengthByteArray32 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -8851,19 +8976,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray32 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 33 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 33 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray33
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray33 _Zero = new FixedLengthByteArray33();
-		public static ref readonly FixedLengthByteArray33 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray33 _Zero = default;
+		public static ref readonly FixedLengthByteArray33 Zero => ref _Zero;
 
-		public readonly int Length => 33;
+		public const int ConstLength = 33;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray33(
 			Byte field0
@@ -9052,8 +9177,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -9064,10 +9189,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray33) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray33)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray33)other);
 
         public readonly bool Equals(in FixedLengthByteArray33 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray33 left, in FixedLengthByteArray33 right)
             => left.Equals(right);
@@ -9079,7 +9204,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -9139,17 +9264,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray33 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray33 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray33 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray33 array, int index)
         {
@@ -9229,14 +9366,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray33 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray33 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray33 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray33 array1, in FixedLengthByteArray33 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -9248,19 +9377,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray33 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 34 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 34 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray34
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray34 _Zero = new FixedLengthByteArray34();
-		public static ref readonly FixedLengthByteArray34 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray34 _Zero = default;
+		public static ref readonly FixedLengthByteArray34 Zero => ref _Zero;
 
-		public readonly int Length => 34;
+		public const int ConstLength = 34;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray34(
 			Byte field0
@@ -9454,8 +9583,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -9466,10 +9595,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray34) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray34)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray34)other);
 
         public readonly bool Equals(in FixedLengthByteArray34 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray34 left, in FixedLengthByteArray34 right)
             => left.Equals(right);
@@ -9481,7 +9610,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -9542,17 +9671,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray34 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray34 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray34 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray34 array, int index)
         {
@@ -9633,14 +9774,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray34 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray34 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray34 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray34 array1, in FixedLengthByteArray34 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -9652,19 +9785,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray34 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 35 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 35 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray35
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray35 _Zero = new FixedLengthByteArray35();
-		public static ref readonly FixedLengthByteArray35 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray35 _Zero = default;
+		public static ref readonly FixedLengthByteArray35 Zero => ref _Zero;
 
-		public readonly int Length => 35;
+		public const int ConstLength = 35;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray35(
 			Byte field0
@@ -9863,8 +9996,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -9875,10 +10008,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray35) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray35)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray35)other);
 
         public readonly bool Equals(in FixedLengthByteArray35 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray35 left, in FixedLengthByteArray35 right)
             => left.Equals(right);
@@ -9890,7 +10023,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -9952,17 +10085,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray35 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray35 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray35 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray35 array, int index)
         {
@@ -10044,14 +10189,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray35 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray35 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray35 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray35 array1, in FixedLengthByteArray35 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -10063,19 +10200,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray35 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray36
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray36 _Zero = new FixedLengthByteArray36();
-		public static ref readonly FixedLengthByteArray36 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray36 _Zero = default;
+		public static ref readonly FixedLengthByteArray36 Zero => ref _Zero;
 
-		public readonly int Length => 36;
+		public const int ConstLength = 36;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray36(
 			Byte field0
@@ -10279,8 +10416,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -10291,10 +10428,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray36) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray36)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray36)other);
 
         public readonly bool Equals(in FixedLengthByteArray36 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray36 left, in FixedLengthByteArray36 right)
             => left.Equals(right);
@@ -10306,7 +10443,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -10369,17 +10506,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray36 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray36 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray36 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray36 array, int index)
         {
@@ -10462,14 +10611,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray36 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray36 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray36 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray36 array1, in FixedLengthByteArray36 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -10481,19 +10622,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray36 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 37 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 37 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray37
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray37 _Zero = new FixedLengthByteArray37();
-		public static ref readonly FixedLengthByteArray37 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray37 _Zero = default;
+		public static ref readonly FixedLengthByteArray37 Zero => ref _Zero;
 
-		public readonly int Length => 37;
+		public const int ConstLength = 37;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray37(
 			Byte field0
@@ -10702,8 +10843,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -10714,10 +10855,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray37) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray37)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray37)other);
 
         public readonly bool Equals(in FixedLengthByteArray37 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray37 left, in FixedLengthByteArray37 right)
             => left.Equals(right);
@@ -10729,7 +10870,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -10793,17 +10934,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray37 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray37 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray37 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray37 array, int index)
         {
@@ -10887,14 +11040,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray37 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray37 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray37 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray37 array1, in FixedLengthByteArray37 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -10906,19 +11051,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray37 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 38 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 38 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray38
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray38 _Zero = new FixedLengthByteArray38();
-		public static ref readonly FixedLengthByteArray38 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray38 _Zero = default;
+		public static ref readonly FixedLengthByteArray38 Zero => ref _Zero;
 
-		public readonly int Length => 38;
+		public const int ConstLength = 38;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray38(
 			Byte field0
@@ -11132,8 +11277,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -11144,10 +11289,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray38) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray38)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray38)other);
 
         public readonly bool Equals(in FixedLengthByteArray38 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray38 left, in FixedLengthByteArray38 right)
             => left.Equals(right);
@@ -11159,7 +11304,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -11224,17 +11369,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray38 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray38 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray38 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray38 array, int index)
         {
@@ -11319,14 +11476,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray38 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray38 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray38 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray38 array1, in FixedLengthByteArray38 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -11338,19 +11487,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray38 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 39 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 39 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray39
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray39 _Zero = new FixedLengthByteArray39();
-		public static ref readonly FixedLengthByteArray39 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray39 _Zero = default;
+		public static ref readonly FixedLengthByteArray39 Zero => ref _Zero;
 
-		public readonly int Length => 39;
+		public const int ConstLength = 39;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray39(
 			Byte field0
@@ -11569,8 +11718,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -11581,10 +11730,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray39) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray39)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray39)other);
 
         public readonly bool Equals(in FixedLengthByteArray39 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray39 left, in FixedLengthByteArray39 right)
             => left.Equals(right);
@@ -11596,7 +11745,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -11662,17 +11811,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray39 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray39 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray39 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray39 array, int index)
         {
@@ -11758,14 +11919,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray39 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray39 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray39 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray39 array1, in FixedLengthByteArray39 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -11777,19 +11930,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray39 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 40 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 40 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray40
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray40 _Zero = new FixedLengthByteArray40();
-		public static ref readonly FixedLengthByteArray40 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray40 _Zero = default;
+		public static ref readonly FixedLengthByteArray40 Zero => ref _Zero;
 
-		public readonly int Length => 40;
+		public const int ConstLength = 40;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray40(
 			Byte field0
@@ -12013,8 +12166,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -12025,10 +12178,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray40) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray40)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray40)other);
 
         public readonly bool Equals(in FixedLengthByteArray40 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray40 left, in FixedLengthByteArray40 right)
             => left.Equals(right);
@@ -12040,7 +12193,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -12107,17 +12260,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray40 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray40 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray40 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray40 array, int index)
         {
@@ -12204,14 +12369,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray40 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray40 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray40 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray40 array1, in FixedLengthByteArray40 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -12223,19 +12380,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray40 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 41 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 41 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray41
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray41 _Zero = new FixedLengthByteArray41();
-		public static ref readonly FixedLengthByteArray41 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray41 _Zero = default;
+		public static ref readonly FixedLengthByteArray41 Zero => ref _Zero;
 
-		public readonly int Length => 41;
+		public const int ConstLength = 41;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray41(
 			Byte field0
@@ -12464,8 +12621,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -12476,10 +12633,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray41) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray41)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray41)other);
 
         public readonly bool Equals(in FixedLengthByteArray41 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray41 left, in FixedLengthByteArray41 right)
             => left.Equals(right);
@@ -12491,7 +12648,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -12559,17 +12716,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray41 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray41 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray41 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray41 array, int index)
         {
@@ -12657,14 +12826,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray41 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray41 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray41 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray41 array1, in FixedLengthByteArray41 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -12676,19 +12837,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray41 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 42 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 42 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray42
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray42 _Zero = new FixedLengthByteArray42();
-		public static ref readonly FixedLengthByteArray42 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray42 _Zero = default;
+		public static ref readonly FixedLengthByteArray42 Zero => ref _Zero;
 
-		public readonly int Length => 42;
+		public const int ConstLength = 42;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray42(
 			Byte field0
@@ -12922,8 +13083,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -12934,10 +13095,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray42) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray42)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray42)other);
 
         public readonly bool Equals(in FixedLengthByteArray42 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray42 left, in FixedLengthByteArray42 right)
             => left.Equals(right);
@@ -12949,7 +13110,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -13018,17 +13179,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray42 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray42 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray42 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray42 array, int index)
         {
@@ -13117,14 +13290,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray42 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray42 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray42 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray42 array1, in FixedLengthByteArray42 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -13136,19 +13301,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray42 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 43 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 43 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray43
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray43 _Zero = new FixedLengthByteArray43();
-		public static ref readonly FixedLengthByteArray43 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray43 _Zero = default;
+		public static ref readonly FixedLengthByteArray43 Zero => ref _Zero;
 
-		public readonly int Length => 43;
+		public const int ConstLength = 43;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray43(
 			Byte field0
@@ -13387,8 +13552,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -13399,10 +13564,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray43) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray43)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray43)other);
 
         public readonly bool Equals(in FixedLengthByteArray43 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray43 left, in FixedLengthByteArray43 right)
             => left.Equals(right);
@@ -13414,7 +13579,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -13484,17 +13649,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray43 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray43 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray43 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray43 array, int index)
         {
@@ -13584,14 +13761,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray43 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray43 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray43 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray43 array1, in FixedLengthByteArray43 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -13603,19 +13772,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray43 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 44 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 44 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray44
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray44 _Zero = new FixedLengthByteArray44();
-		public static ref readonly FixedLengthByteArray44 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray44 _Zero = default;
+		public static ref readonly FixedLengthByteArray44 Zero => ref _Zero;
 
-		public readonly int Length => 44;
+		public const int ConstLength = 44;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray44(
 			Byte field0
@@ -13859,8 +14028,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -13871,10 +14040,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray44) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray44)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray44)other);
 
         public readonly bool Equals(in FixedLengthByteArray44 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray44 left, in FixedLengthByteArray44 right)
             => left.Equals(right);
@@ -13886,7 +14055,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -13957,17 +14126,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray44 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray44 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray44 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray44 array, int index)
         {
@@ -14058,14 +14239,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray44 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray44 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray44 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray44 array1, in FixedLengthByteArray44 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -14077,19 +14250,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray44 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 45 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 45 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray45
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray45 _Zero = new FixedLengthByteArray45();
-		public static ref readonly FixedLengthByteArray45 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray45 _Zero = default;
+		public static ref readonly FixedLengthByteArray45 Zero => ref _Zero;
 
-		public readonly int Length => 45;
+		public const int ConstLength = 45;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray45(
 			Byte field0
@@ -14338,8 +14511,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -14350,10 +14523,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray45) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray45)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray45)other);
 
         public readonly bool Equals(in FixedLengthByteArray45 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray45 left, in FixedLengthByteArray45 right)
             => left.Equals(right);
@@ -14365,7 +14538,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -14437,17 +14610,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray45 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray45 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray45 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray45 array, int index)
         {
@@ -14539,14 +14724,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray45 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray45 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray45 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray45 array1, in FixedLengthByteArray45 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -14558,19 +14735,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray45 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 46 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 46 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray46
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray46 _Zero = new FixedLengthByteArray46();
-		public static ref readonly FixedLengthByteArray46 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray46 _Zero = default;
+		public static ref readonly FixedLengthByteArray46 Zero => ref _Zero;
 
-		public readonly int Length => 46;
+		public const int ConstLength = 46;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray46(
 			Byte field0
@@ -14824,8 +15001,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -14836,10 +15013,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray46) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray46)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray46)other);
 
         public readonly bool Equals(in FixedLengthByteArray46 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray46 left, in FixedLengthByteArray46 right)
             => left.Equals(right);
@@ -14851,7 +15028,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -14924,17 +15101,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray46 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray46 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray46 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray46 array, int index)
         {
@@ -15027,14 +15216,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray46 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray46 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray46 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray46 array1, in FixedLengthByteArray46 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -15046,19 +15227,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray46 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 47 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 47 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray47
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray47 _Zero = new FixedLengthByteArray47();
-		public static ref readonly FixedLengthByteArray47 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray47 _Zero = default;
+		public static ref readonly FixedLengthByteArray47 Zero => ref _Zero;
 
-		public readonly int Length => 47;
+		public const int ConstLength = 47;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray47(
 			Byte field0
@@ -15317,8 +15498,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -15329,10 +15510,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray47) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray47)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray47)other);
 
         public readonly bool Equals(in FixedLengthByteArray47 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray47 left, in FixedLengthByteArray47 right)
             => left.Equals(right);
@@ -15344,7 +15525,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -15418,17 +15599,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray47 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray47 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray47 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray47 array, int index)
         {
@@ -15522,14 +15715,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray47 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray47 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray47 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray47 array1, in FixedLengthByteArray47 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -15541,19 +15726,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray47 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray48
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray48 _Zero = new FixedLengthByteArray48();
-		public static ref readonly FixedLengthByteArray48 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray48 _Zero = default;
+		public static ref readonly FixedLengthByteArray48 Zero => ref _Zero;
 
-		public readonly int Length => 48;
+		public const int ConstLength = 48;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray48(
 			Byte field0
@@ -15817,8 +16002,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -15829,10 +16014,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray48) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray48)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray48)other);
 
         public readonly bool Equals(in FixedLengthByteArray48 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray48 left, in FixedLengthByteArray48 right)
             => left.Equals(right);
@@ -15844,7 +16029,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -15919,17 +16104,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray48 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray48 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray48 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray48 array, int index)
         {
@@ -16024,14 +16221,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray48 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray48 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray48 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray48 array1, in FixedLengthByteArray48 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -16043,19 +16232,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray48 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 49 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 49 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray49
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray49 _Zero = new FixedLengthByteArray49();
-		public static ref readonly FixedLengthByteArray49 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray49 _Zero = default;
+		public static ref readonly FixedLengthByteArray49 Zero => ref _Zero;
 
-		public readonly int Length => 49;
+		public const int ConstLength = 49;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray49(
 			Byte field0
@@ -16324,8 +16513,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -16336,10 +16525,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray49) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray49)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray49)other);
 
         public readonly bool Equals(in FixedLengthByteArray49 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray49 left, in FixedLengthByteArray49 right)
             => left.Equals(right);
@@ -16351,7 +16540,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -16427,17 +16616,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray49 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray49 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray49 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray49 array, int index)
         {
@@ -16533,14 +16734,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray49 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray49 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray49 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray49 array1, in FixedLengthByteArray49 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -16552,19 +16745,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray49 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 50 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 50 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray50
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray50 _Zero = new FixedLengthByteArray50();
-		public static ref readonly FixedLengthByteArray50 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray50 _Zero = default;
+		public static ref readonly FixedLengthByteArray50 Zero => ref _Zero;
 
-		public readonly int Length => 50;
+		public const int ConstLength = 50;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray50(
 			Byte field0
@@ -16838,8 +17031,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -16850,10 +17043,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray50) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray50)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray50)other);
 
         public readonly bool Equals(in FixedLengthByteArray50 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray50 left, in FixedLengthByteArray50 right)
             => left.Equals(right);
@@ -16865,7 +17058,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -16942,17 +17135,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray50 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray50 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray50 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray50 array, int index)
         {
@@ -17049,14 +17254,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray50 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray50 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray50 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray50 array1, in FixedLengthByteArray50 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -17068,19 +17265,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray50 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 51 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 51 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray51
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray51 _Zero = new FixedLengthByteArray51();
-		public static ref readonly FixedLengthByteArray51 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray51 _Zero = default;
+		public static ref readonly FixedLengthByteArray51 Zero => ref _Zero;
 
-		public readonly int Length => 51;
+		public const int ConstLength = 51;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray51(
 			Byte field0
@@ -17359,8 +17556,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -17371,10 +17568,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray51) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray51)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray51)other);
 
         public readonly bool Equals(in FixedLengthByteArray51 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray51 left, in FixedLengthByteArray51 right)
             => left.Equals(right);
@@ -17386,7 +17583,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -17464,17 +17661,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray51 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray51 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray51 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray51 array, int index)
         {
@@ -17572,14 +17781,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray51 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray51 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray51 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray51 array1, in FixedLengthByteArray51 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -17591,19 +17792,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray51 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 52 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 52 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray52
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray52 _Zero = new FixedLengthByteArray52();
-		public static ref readonly FixedLengthByteArray52 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray52 _Zero = default;
+		public static ref readonly FixedLengthByteArray52 Zero => ref _Zero;
 
-		public readonly int Length => 52;
+		public const int ConstLength = 52;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray52(
 			Byte field0
@@ -17887,8 +18088,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -17899,10 +18100,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray52) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray52)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray52)other);
 
         public readonly bool Equals(in FixedLengthByteArray52 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray52 left, in FixedLengthByteArray52 right)
             => left.Equals(right);
@@ -17914,7 +18115,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -17993,17 +18194,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray52 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray52 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray52 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray52 array, int index)
         {
@@ -18102,14 +18315,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray52 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray52 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray52 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray52 array1, in FixedLengthByteArray52 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -18121,19 +18326,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray52 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 53 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 53 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray53
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray53 _Zero = new FixedLengthByteArray53();
-		public static ref readonly FixedLengthByteArray53 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray53 _Zero = default;
+		public static ref readonly FixedLengthByteArray53 Zero => ref _Zero;
 
-		public readonly int Length => 53;
+		public const int ConstLength = 53;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray53(
 			Byte field0
@@ -18422,8 +18627,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -18434,10 +18639,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray53) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray53)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray53)other);
 
         public readonly bool Equals(in FixedLengthByteArray53 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray53 left, in FixedLengthByteArray53 right)
             => left.Equals(right);
@@ -18449,7 +18654,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -18529,17 +18734,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray53 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray53 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray53 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray53 array, int index)
         {
@@ -18639,14 +18856,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray53 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray53 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray53 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray53 array1, in FixedLengthByteArray53 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -18658,19 +18867,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray53 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 54 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 54 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray54
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray54 _Zero = new FixedLengthByteArray54();
-		public static ref readonly FixedLengthByteArray54 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray54 _Zero = default;
+		public static ref readonly FixedLengthByteArray54 Zero => ref _Zero;
 
-		public readonly int Length => 54;
+		public const int ConstLength = 54;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray54(
 			Byte field0
@@ -18964,8 +19173,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -18976,10 +19185,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray54) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray54)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray54)other);
 
         public readonly bool Equals(in FixedLengthByteArray54 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray54 left, in FixedLengthByteArray54 right)
             => left.Equals(right);
@@ -18991,7 +19200,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -19072,17 +19281,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray54 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray54 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray54 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray54 array, int index)
         {
@@ -19183,14 +19404,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray54 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray54 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray54 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray54 array1, in FixedLengthByteArray54 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -19202,19 +19415,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray54 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 55 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 55 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray55
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray55 _Zero = new FixedLengthByteArray55();
-		public static ref readonly FixedLengthByteArray55 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray55 _Zero = default;
+		public static ref readonly FixedLengthByteArray55 Zero => ref _Zero;
 
-		public readonly int Length => 55;
+		public const int ConstLength = 55;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray55(
 			Byte field0
@@ -19513,8 +19726,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -19525,10 +19738,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray55) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray55)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray55)other);
 
         public readonly bool Equals(in FixedLengthByteArray55 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray55 left, in FixedLengthByteArray55 right)
             => left.Equals(right);
@@ -19540,7 +19753,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -19622,17 +19835,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray55 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray55 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray55 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray55 array, int index)
         {
@@ -19734,14 +19959,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray55 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray55 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray55 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray55 array1, in FixedLengthByteArray55 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -19753,19 +19970,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray55 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 56 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 56 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray56
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray56 _Zero = new FixedLengthByteArray56();
-		public static ref readonly FixedLengthByteArray56 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray56 _Zero = default;
+		public static ref readonly FixedLengthByteArray56 Zero => ref _Zero;
 
-		public readonly int Length => 56;
+		public const int ConstLength = 56;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray56(
 			Byte field0
@@ -20069,8 +20286,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -20081,10 +20298,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray56) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray56)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray56)other);
 
         public readonly bool Equals(in FixedLengthByteArray56 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray56 left, in FixedLengthByteArray56 right)
             => left.Equals(right);
@@ -20096,7 +20313,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -20179,17 +20396,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray56 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray56 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray56 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray56 array, int index)
         {
@@ -20292,14 +20521,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray56 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray56 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray56 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray56 array1, in FixedLengthByteArray56 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -20311,19 +20532,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray56 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 57 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 57 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray57
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray57 _Zero = new FixedLengthByteArray57();
-		public static ref readonly FixedLengthByteArray57 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray57 _Zero = default;
+		public static ref readonly FixedLengthByteArray57 Zero => ref _Zero;
 
-		public readonly int Length => 57;
+		public const int ConstLength = 57;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray57(
 			Byte field0
@@ -20632,8 +20853,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -20644,10 +20865,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray57) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray57)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray57)other);
 
         public readonly bool Equals(in FixedLengthByteArray57 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray57 left, in FixedLengthByteArray57 right)
             => left.Equals(right);
@@ -20659,7 +20880,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -20743,17 +20964,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray57 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray57 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray57 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray57 array, int index)
         {
@@ -20857,14 +21090,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray57 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray57 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray57 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray57 array1, in FixedLengthByteArray57 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -20876,19 +21101,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray57 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 58 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 58 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray58
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray58 _Zero = new FixedLengthByteArray58();
-		public static ref readonly FixedLengthByteArray58 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray58 _Zero = default;
+		public static ref readonly FixedLengthByteArray58 Zero => ref _Zero;
 
-		public readonly int Length => 58;
+		public const int ConstLength = 58;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray58(
 			Byte field0
@@ -21202,8 +21427,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -21214,10 +21439,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray58) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray58)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray58)other);
 
         public readonly bool Equals(in FixedLengthByteArray58 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray58 left, in FixedLengthByteArray58 right)
             => left.Equals(right);
@@ -21229,7 +21454,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -21314,17 +21539,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray58 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray58 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray58 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray58 array, int index)
         {
@@ -21429,14 +21666,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray58 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray58 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray58 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray58 array1, in FixedLengthByteArray58 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -21448,19 +21677,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray58 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 59 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 59 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray59
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray59 _Zero = new FixedLengthByteArray59();
-		public static ref readonly FixedLengthByteArray59 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray59 _Zero = default;
+		public static ref readonly FixedLengthByteArray59 Zero => ref _Zero;
 
-		public readonly int Length => 59;
+		public const int ConstLength = 59;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray59(
 			Byte field0
@@ -21779,8 +22008,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -21791,10 +22020,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray59) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray59)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray59)other);
 
         public readonly bool Equals(in FixedLengthByteArray59 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray59 left, in FixedLengthByteArray59 right)
             => left.Equals(right);
@@ -21806,7 +22035,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -21892,17 +22121,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray59 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray59 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray59 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray59 array, int index)
         {
@@ -22008,14 +22249,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray59 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray59 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray59 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray59 array1, in FixedLengthByteArray59 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -22027,19 +22260,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray59 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 60 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 60 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray60
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray60 _Zero = new FixedLengthByteArray60();
-		public static ref readonly FixedLengthByteArray60 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray60 _Zero = default;
+		public static ref readonly FixedLengthByteArray60 Zero => ref _Zero;
 
-		public readonly int Length => 60;
+		public const int ConstLength = 60;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray60(
 			Byte field0
@@ -22363,8 +22596,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -22375,10 +22608,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray60) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray60)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray60)other);
 
         public readonly bool Equals(in FixedLengthByteArray60 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray60 left, in FixedLengthByteArray60 right)
             => left.Equals(right);
@@ -22390,7 +22623,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -22477,17 +22710,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray60 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray60 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray60 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray60 array, int index)
         {
@@ -22594,14 +22839,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray60 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray60 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray60 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray60 array1, in FixedLengthByteArray60 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -22613,19 +22850,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray60 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 61 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 61 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray61
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray61 _Zero = new FixedLengthByteArray61();
-		public static ref readonly FixedLengthByteArray61 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray61 _Zero = default;
+		public static ref readonly FixedLengthByteArray61 Zero => ref _Zero;
 
-		public readonly int Length => 61;
+		public const int ConstLength = 61;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray61(
 			Byte field0
@@ -22954,8 +23191,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -22966,10 +23203,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray61) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray61)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray61)other);
 
         public readonly bool Equals(in FixedLengthByteArray61 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray61 left, in FixedLengthByteArray61 right)
             => left.Equals(right);
@@ -22981,7 +23218,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -23069,17 +23306,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray61 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray61 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray61 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray61 array, int index)
         {
@@ -23187,14 +23436,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray61 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray61 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray61 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray61 array1, in FixedLengthByteArray61 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -23206,19 +23447,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray61 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 62 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 62 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray62
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray62 _Zero = new FixedLengthByteArray62();
-		public static ref readonly FixedLengthByteArray62 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray62 _Zero = default;
+		public static ref readonly FixedLengthByteArray62 Zero => ref _Zero;
 
-		public readonly int Length => 62;
+		public const int ConstLength = 62;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray62(
 			Byte field0
@@ -23552,8 +23793,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -23564,10 +23805,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray62) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray62)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray62)other);
 
         public readonly bool Equals(in FixedLengthByteArray62 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray62 left, in FixedLengthByteArray62 right)
             => left.Equals(right);
@@ -23579,7 +23820,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -23668,17 +23909,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray62 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray62 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray62 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray62 array, int index)
         {
@@ -23787,14 +24040,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray62 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray62 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray62 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray62 array1, in FixedLengthByteArray62 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -23806,19 +24051,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray62 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 63 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 63 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray63
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray63 _Zero = new FixedLengthByteArray63();
-		public static ref readonly FixedLengthByteArray63 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray63 _Zero = default;
+		public static ref readonly FixedLengthByteArray63 Zero => ref _Zero;
 
-		public readonly int Length => 63;
+		public const int ConstLength = 63;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray63(
 			Byte field0
@@ -24157,8 +24402,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -24169,10 +24414,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray63) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray63)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray63)other);
 
         public readonly bool Equals(in FixedLengthByteArray63 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray63 left, in FixedLengthByteArray63 right)
             => left.Equals(right);
@@ -24184,7 +24429,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -24274,17 +24519,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray63 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray63 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray63 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray63 array, int index)
         {
@@ -24394,14 +24651,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray63 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray63 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray63 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray63 array1, in FixedLengthByteArray63 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -24413,19 +24662,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray63 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 64 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 64 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray64
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray64 _Zero = new FixedLengthByteArray64();
-		public static ref readonly FixedLengthByteArray64 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray64 _Zero = default;
+		public static ref readonly FixedLengthByteArray64 Zero => ref _Zero;
 
-		public readonly int Length => 64;
+		public const int ConstLength = 64;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray64(
 			Byte field0
@@ -24769,8 +25018,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -24781,10 +25030,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray64) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray64)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray64)other);
 
         public readonly bool Equals(in FixedLengthByteArray64 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray64 left, in FixedLengthByteArray64 right)
             => left.Equals(right);
@@ -24796,7 +25045,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -24887,17 +25136,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray64 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray64 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray64 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray64 array, int index)
         {
@@ -25008,14 +25269,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray64 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray64 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray64 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray64 array1, in FixedLengthByteArray64 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -25027,19 +25280,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray64 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 65 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 65 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray65
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray65 _Zero = new FixedLengthByteArray65();
-		public static ref readonly FixedLengthByteArray65 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray65 _Zero = default;
+		public static ref readonly FixedLengthByteArray65 Zero => ref _Zero;
 
-		public readonly int Length => 65;
+		public const int ConstLength = 65;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray65(
 			Byte field0
@@ -25388,8 +25641,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -25400,10 +25653,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray65) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray65)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray65)other);
 
         public readonly bool Equals(in FixedLengthByteArray65 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray65 left, in FixedLengthByteArray65 right)
             => left.Equals(right);
@@ -25415,7 +25668,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -25507,17 +25760,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray65 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray65 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray65 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray65 array, int index)
         {
@@ -25629,14 +25894,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray65 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray65 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray65 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray65 array1, in FixedLengthByteArray65 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -25648,19 +25905,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray65 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 96 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 96 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray96
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray96 _Zero = new FixedLengthByteArray96();
-		public static ref readonly FixedLengthByteArray96 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray96 _Zero = default;
+		public static ref readonly FixedLengthByteArray96 Zero => ref _Zero;
 
-		public readonly int Length => 96;
+		public const int ConstLength = 96;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray96(
 			Byte field0
@@ -26164,8 +26421,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -26176,10 +26433,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray96) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray96)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray96)other);
 
         public readonly bool Equals(in FixedLengthByteArray96 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray96 left, in FixedLengthByteArray96 right)
             => left.Equals(right);
@@ -26191,7 +26448,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -26314,17 +26571,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray96 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray96 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray96 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray96 array, int index)
         {
@@ -26467,14 +26736,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray96 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray96 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray96 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray96 array1, in FixedLengthByteArray96 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -26486,19 +26747,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray96 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 128 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 128 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray128
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray128 _Zero = new FixedLengthByteArray128();
-		public static ref readonly FixedLengthByteArray128 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray128 _Zero = default;
+		public static ref readonly FixedLengthByteArray128 Zero => ref _Zero;
 
-		public readonly int Length => 128;
+		public const int ConstLength = 128;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray128(
 			Byte field0
@@ -27162,8 +27423,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -27174,10 +27435,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray128) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray128)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray128)other);
 
         public readonly bool Equals(in FixedLengthByteArray128 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray128 left, in FixedLengthByteArray128 right)
             => left.Equals(right);
@@ -27189,7 +27450,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -27344,17 +27605,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray128 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray128 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray128 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray128 array, int index)
         {
@@ -27529,14 +27802,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray128 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray128 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray128 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray128 array1, in FixedLengthByteArray128 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -27548,19 +27813,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray128 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 192 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 192 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray192
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray192 _Zero = new FixedLengthByteArray192();
-		public static ref readonly FixedLengthByteArray192 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray192 _Zero = default;
+		public static ref readonly FixedLengthByteArray192 Zero => ref _Zero;
 
-		public readonly int Length => 192;
+		public const int ConstLength = 192;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray192(
 			Byte field0
@@ -28544,8 +28809,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -28556,10 +28821,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray192) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray192)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray192)other);
 
         public readonly bool Equals(in FixedLengthByteArray192 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray192 left, in FixedLengthByteArray192 right)
             => left.Equals(right);
@@ -28571,7 +28836,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -28790,17 +29055,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray192 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray192 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray192 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray192 array, int index)
         {
@@ -29039,14 +29316,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray192 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray192 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray192 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray192 array1, in FixedLengthByteArray192 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -29058,19 +29327,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray192 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 256 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 256 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray256
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray256 _Zero = new FixedLengthByteArray256();
-		public static ref readonly FixedLengthByteArray256 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray256 _Zero = default;
+		public static ref readonly FixedLengthByteArray256 Zero => ref _Zero;
 
-		public readonly int Length => 256;
+		public const int ConstLength = 256;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray256(
 			Byte field0
@@ -30374,8 +30643,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -30386,10 +30655,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray256) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray256)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray256)other);
 
         public readonly bool Equals(in FixedLengthByteArray256 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray256 left, in FixedLengthByteArray256 right)
             => left.Equals(right);
@@ -30401,7 +30670,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -30684,17 +30953,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray256 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray256 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray256 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray256 array, int index)
         {
@@ -30997,14 +31278,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray256 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray256 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray256 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray256 array1, in FixedLengthByteArray256 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -31016,19 +31289,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray256 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 260 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 260 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray260
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray260 _Zero = new FixedLengthByteArray260();
-		public static ref readonly FixedLengthByteArray260 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray260 _Zero = default;
+		public static ref readonly FixedLengthByteArray260 Zero => ref _Zero;
 
-		public readonly int Length => 260;
+		public const int ConstLength = 260;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray260(
 			Byte field0
@@ -32352,8 +32625,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -32364,10 +32637,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray260) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray260)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray260)other);
 
         public readonly bool Equals(in FixedLengthByteArray260 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray260 left, in FixedLengthByteArray260 right)
             => left.Equals(right);
@@ -32379,7 +32652,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -32666,17 +32939,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray260 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray260 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray260 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray260 array, int index)
         {
@@ -32983,14 +33268,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray260 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray260 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray260 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray260 array1, in FixedLengthByteArray260 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -33002,19 +33279,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray260 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 384 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 384 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray384
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray384 _Zero = new FixedLengthByteArray384();
-		public static ref readonly FixedLengthByteArray384 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray384 _Zero = default;
+		public static ref readonly FixedLengthByteArray384 Zero => ref _Zero;
 
-		public readonly int Length => 384;
+		public const int ConstLength = 384;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray384(
 			Byte field0
@@ -34958,8 +35235,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -34970,10 +35247,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray384) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray384)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray384)other);
 
         public readonly bool Equals(in FixedLengthByteArray384 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray384 left, in FixedLengthByteArray384 right)
             => left.Equals(right);
@@ -34985,7 +35262,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -35396,17 +35673,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray384 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray384 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray384 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray384 array, int index)
         {
@@ -35837,14 +36126,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray384 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray384 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray384 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray384 array1, in FixedLengthByteArray384 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -35856,19 +36137,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray384 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 512 * sizeof(Byte))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 512 * sizeof(Byte), CharSet = CharSet.Unicode)]
 	public struct FixedLengthByteArray512
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Byte>
 #endif
 	{
-		private static readonly FixedLengthByteArray512 _Zero = new FixedLengthByteArray512();
-		public static ref readonly FixedLengthByteArray512 RefToZero => ref _Zero;
+		private static readonly FixedLengthByteArray512 _Zero = default;
+		public static ref readonly FixedLengthByteArray512 Zero => ref _Zero;
 
-		public readonly int Length => 512;
+		public const int ConstLength = 512;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthByteArray512(
 			Byte field0
@@ -38452,8 +38733,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -38464,10 +38745,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthByteArray512) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthByteArray512)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthByteArray512)other);
 
         public readonly bool Equals(in FixedLengthByteArray512 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthByteArray512 left, in FixedLengthByteArray512 right)
             => left.Equals(right);
@@ -38479,7 +38760,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -39018,17 +39299,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Byte>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Byte>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Byte>(in FixedLengthByteArray512 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Byte> AsSpan(this ref FixedLengthByteArray512 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray512 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Byte At(this ref FixedLengthByteArray512 array, int index)
         {
@@ -39587,14 +39880,6 @@ namespace FixedLengthArray
         public static ref Byte At(this ref FixedLengthByteArray512 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Byte> AsSpan(this ref FixedLengthByteArray512 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Byte> AsReadOnlySpan(this in FixedLengthByteArray512 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthByteArray512 array1, in FixedLengthByteArray512 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -39606,19 +39891,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthByteArray512 array, Byte value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray2
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray2 _Zero = new FixedLengthCharArray2();
-		public static ref readonly FixedLengthCharArray2 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray2 _Zero = default;
+		public static ref readonly FixedLengthCharArray2 Zero => ref _Zero;
 
-		public readonly int Length => 2;
+		public const int ConstLength = 2;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray2(
 			Char field0
@@ -39652,8 +39937,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -39664,10 +39949,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray2) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray2)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray2)other);
 
         public readonly bool Equals(in FixedLengthCharArray2 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray2 left, in FixedLengthCharArray2 right)
             => left.Equals(right);
@@ -39679,7 +39964,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -39708,17 +39993,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray2 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray2 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray2 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray2 array, int index)
         {
@@ -39767,14 +40064,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray2 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray2 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray2 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray2 array1, in FixedLengthCharArray2 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -39786,19 +40075,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray2 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray3
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray3 _Zero = new FixedLengthCharArray3();
-		public static ref readonly FixedLengthCharArray3 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray3 _Zero = default;
+		public static ref readonly FixedLengthCharArray3 Zero => ref _Zero;
 
-		public readonly int Length => 3;
+		public const int ConstLength = 3;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray3(
 			Char field0
@@ -39837,8 +40126,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -39849,10 +40138,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray3) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray3)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray3)other);
 
         public readonly bool Equals(in FixedLengthCharArray3 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray3 left, in FixedLengthCharArray3 right)
             => left.Equals(right);
@@ -39864,7 +40153,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -39894,17 +40183,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray3 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray3 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray3 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray3 array, int index)
         {
@@ -39954,14 +40255,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray3 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray3 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray3 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray3 array1, in FixedLengthCharArray3 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -39973,19 +40266,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray3 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray4
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray4 _Zero = new FixedLengthCharArray4();
-		public static ref readonly FixedLengthCharArray4 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray4 _Zero = default;
+		public static ref readonly FixedLengthCharArray4 Zero => ref _Zero;
 
-		public readonly int Length => 4;
+		public const int ConstLength = 4;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray4(
 			Char field0
@@ -40029,8 +40322,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -40041,10 +40334,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray4) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray4)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray4)other);
 
         public readonly bool Equals(in FixedLengthCharArray4 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray4 left, in FixedLengthCharArray4 right)
             => left.Equals(right);
@@ -40056,7 +40349,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -40087,17 +40380,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray4 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray4 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray4 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray4 array, int index)
         {
@@ -40148,14 +40453,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray4 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray4 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray4 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray4 array1, in FixedLengthCharArray4 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -40167,19 +40464,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray4 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 5 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 5 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray5
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray5 _Zero = new FixedLengthCharArray5();
-		public static ref readonly FixedLengthCharArray5 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray5 _Zero = default;
+		public static ref readonly FixedLengthCharArray5 Zero => ref _Zero;
 
-		public readonly int Length => 5;
+		public const int ConstLength = 5;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray5(
 			Char field0
@@ -40228,8 +40525,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -40240,10 +40537,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray5) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray5)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray5)other);
 
         public readonly bool Equals(in FixedLengthCharArray5 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray5 left, in FixedLengthCharArray5 right)
             => left.Equals(right);
@@ -40255,7 +40552,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -40287,17 +40584,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray5 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray5 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray5 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray5 array, int index)
         {
@@ -40349,14 +40658,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray5 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray5 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray5 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray5 array1, in FixedLengthCharArray5 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -40368,19 +40669,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray5 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 6 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 6 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray6
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray6 _Zero = new FixedLengthCharArray6();
-		public static ref readonly FixedLengthCharArray6 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray6 _Zero = default;
+		public static ref readonly FixedLengthCharArray6 Zero => ref _Zero;
 
-		public readonly int Length => 6;
+		public const int ConstLength = 6;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray6(
 			Char field0
@@ -40434,8 +40735,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -40446,10 +40747,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray6) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray6)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray6)other);
 
         public readonly bool Equals(in FixedLengthCharArray6 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray6 left, in FixedLengthCharArray6 right)
             => left.Equals(right);
@@ -40461,7 +40762,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -40494,17 +40795,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray6 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray6 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray6 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray6 array, int index)
         {
@@ -40557,14 +40870,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray6 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray6 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray6 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray6 array1, in FixedLengthCharArray6 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -40576,19 +40881,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray6 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 7 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 7 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray7
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray7 _Zero = new FixedLengthCharArray7();
-		public static ref readonly FixedLengthCharArray7 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray7 _Zero = default;
+		public static ref readonly FixedLengthCharArray7 Zero => ref _Zero;
 
-		public readonly int Length => 7;
+		public const int ConstLength = 7;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray7(
 			Char field0
@@ -40647,8 +40952,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -40659,10 +40964,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray7) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray7)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray7)other);
 
         public readonly bool Equals(in FixedLengthCharArray7 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray7 left, in FixedLengthCharArray7 right)
             => left.Equals(right);
@@ -40674,7 +40979,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -40708,17 +41013,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray7 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray7 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray7 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray7 array, int index)
         {
@@ -40772,14 +41089,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray7 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray7 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray7 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray7 array1, in FixedLengthCharArray7 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -40791,19 +41100,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray7 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray8
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray8 _Zero = new FixedLengthCharArray8();
-		public static ref readonly FixedLengthCharArray8 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray8 _Zero = default;
+		public static ref readonly FixedLengthCharArray8 Zero => ref _Zero;
 
-		public readonly int Length => 8;
+		public const int ConstLength = 8;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray8(
 			Char field0
@@ -40867,8 +41176,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -40879,10 +41188,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray8) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray8)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray8)other);
 
         public readonly bool Equals(in FixedLengthCharArray8 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray8 left, in FixedLengthCharArray8 right)
             => left.Equals(right);
@@ -40894,7 +41203,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -40929,17 +41238,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray8 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray8 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray8 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray8 array, int index)
         {
@@ -40994,14 +41315,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray8 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray8 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray8 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray8 array1, in FixedLengthCharArray8 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -41013,19 +41326,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray8 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 9 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 9 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray9
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray9 _Zero = new FixedLengthCharArray9();
-		public static ref readonly FixedLengthCharArray9 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray9 _Zero = default;
+		public static ref readonly FixedLengthCharArray9 Zero => ref _Zero;
 
-		public readonly int Length => 9;
+		public const int ConstLength = 9;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray9(
 			Char field0
@@ -41094,8 +41407,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -41106,10 +41419,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray9) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray9)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray9)other);
 
         public readonly bool Equals(in FixedLengthCharArray9 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray9 left, in FixedLengthCharArray9 right)
             => left.Equals(right);
@@ -41121,7 +41434,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -41157,17 +41470,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray9 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray9 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray9 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray9 array, int index)
         {
@@ -41223,14 +41548,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray9 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray9 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray9 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray9 array1, in FixedLengthCharArray9 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -41242,19 +41559,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray9 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 10 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray10
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray10 _Zero = new FixedLengthCharArray10();
-		public static ref readonly FixedLengthCharArray10 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray10 _Zero = default;
+		public static ref readonly FixedLengthCharArray10 Zero => ref _Zero;
 
-		public readonly int Length => 10;
+		public const int ConstLength = 10;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray10(
 			Char field0
@@ -41328,8 +41645,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -41340,10 +41657,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray10) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray10)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray10)other);
 
         public readonly bool Equals(in FixedLengthCharArray10 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray10 left, in FixedLengthCharArray10 right)
             => left.Equals(right);
@@ -41355,7 +41672,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -41392,17 +41709,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray10 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray10 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray10 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray10 array, int index)
         {
@@ -41459,14 +41788,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray10 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray10 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray10 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray10 array1, in FixedLengthCharArray10 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -41478,19 +41799,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray10 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 11 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 11 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray11
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray11 _Zero = new FixedLengthCharArray11();
-		public static ref readonly FixedLengthCharArray11 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray11 _Zero = default;
+		public static ref readonly FixedLengthCharArray11 Zero => ref _Zero;
 
-		public readonly int Length => 11;
+		public const int ConstLength = 11;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray11(
 			Char field0
@@ -41569,8 +41890,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -41581,10 +41902,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray11) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray11)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray11)other);
 
         public readonly bool Equals(in FixedLengthCharArray11 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray11 left, in FixedLengthCharArray11 right)
             => left.Equals(right);
@@ -41596,7 +41917,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -41634,17 +41955,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray11 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray11 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray11 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray11 array, int index)
         {
@@ -41702,14 +42035,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray11 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray11 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray11 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray11 array1, in FixedLengthCharArray11 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -41721,19 +42046,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray11 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray12
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray12 _Zero = new FixedLengthCharArray12();
-		public static ref readonly FixedLengthCharArray12 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray12 _Zero = default;
+		public static ref readonly FixedLengthCharArray12 Zero => ref _Zero;
 
-		public readonly int Length => 12;
+		public const int ConstLength = 12;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray12(
 			Char field0
@@ -41817,8 +42142,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -41829,10 +42154,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray12) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray12)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray12)other);
 
         public readonly bool Equals(in FixedLengthCharArray12 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray12 left, in FixedLengthCharArray12 right)
             => left.Equals(right);
@@ -41844,7 +42169,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -41883,17 +42208,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray12 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray12 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray12 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray12 array, int index)
         {
@@ -41952,14 +42289,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray12 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray12 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray12 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray12 array1, in FixedLengthCharArray12 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -41971,19 +42300,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray12 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 13 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 13 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray13
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray13 _Zero = new FixedLengthCharArray13();
-		public static ref readonly FixedLengthCharArray13 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray13 _Zero = default;
+		public static ref readonly FixedLengthCharArray13 Zero => ref _Zero;
 
-		public readonly int Length => 13;
+		public const int ConstLength = 13;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray13(
 			Char field0
@@ -42072,8 +42401,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -42084,10 +42413,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray13) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray13)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray13)other);
 
         public readonly bool Equals(in FixedLengthCharArray13 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray13 left, in FixedLengthCharArray13 right)
             => left.Equals(right);
@@ -42099,7 +42428,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -42139,17 +42468,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray13 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray13 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray13 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray13 array, int index)
         {
@@ -42209,14 +42550,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray13 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray13 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray13 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray13 array1, in FixedLengthCharArray13 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -42228,19 +42561,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray13 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 14 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 14 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray14
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray14 _Zero = new FixedLengthCharArray14();
-		public static ref readonly FixedLengthCharArray14 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray14 _Zero = default;
+		public static ref readonly FixedLengthCharArray14 Zero => ref _Zero;
 
-		public readonly int Length => 14;
+		public const int ConstLength = 14;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray14(
 			Char field0
@@ -42334,8 +42667,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -42346,10 +42679,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray14) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray14)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray14)other);
 
         public readonly bool Equals(in FixedLengthCharArray14 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray14 left, in FixedLengthCharArray14 right)
             => left.Equals(right);
@@ -42361,7 +42694,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -42402,17 +42735,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray14 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray14 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray14 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray14 array, int index)
         {
@@ -42473,14 +42818,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray14 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray14 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray14 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray14 array1, in FixedLengthCharArray14 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -42492,19 +42829,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray14 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 15 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 15 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray15
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray15 _Zero = new FixedLengthCharArray15();
-		public static ref readonly FixedLengthCharArray15 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray15 _Zero = default;
+		public static ref readonly FixedLengthCharArray15 Zero => ref _Zero;
 
-		public readonly int Length => 15;
+		public const int ConstLength = 15;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray15(
 			Char field0
@@ -42603,8 +42940,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -42615,10 +42952,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray15) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray15)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray15)other);
 
         public readonly bool Equals(in FixedLengthCharArray15 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray15 left, in FixedLengthCharArray15 right)
             => left.Equals(right);
@@ -42630,7 +42967,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -42672,17 +43009,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray15 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray15 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray15 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray15 array, int index)
         {
@@ -42744,14 +43093,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray15 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray15 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray15 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray15 array1, in FixedLengthCharArray15 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -42763,19 +43104,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray15 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray16
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray16 _Zero = new FixedLengthCharArray16();
-		public static ref readonly FixedLengthCharArray16 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray16 _Zero = default;
+		public static ref readonly FixedLengthCharArray16 Zero => ref _Zero;
 
-		public readonly int Length => 16;
+		public const int ConstLength = 16;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray16(
 			Char field0
@@ -42879,8 +43220,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -42891,10 +43232,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray16) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray16)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray16)other);
 
         public readonly bool Equals(in FixedLengthCharArray16 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray16 left, in FixedLengthCharArray16 right)
             => left.Equals(right);
@@ -42906,7 +43247,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -42949,17 +43290,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray16 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray16 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray16 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray16 array, int index)
         {
@@ -43022,14 +43375,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray16 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray16 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray16 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray16 array1, in FixedLengthCharArray16 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -43041,19 +43386,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray16 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 17 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 17 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray17
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray17 _Zero = new FixedLengthCharArray17();
-		public static ref readonly FixedLengthCharArray17 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray17 _Zero = default;
+		public static ref readonly FixedLengthCharArray17 Zero => ref _Zero;
 
-		public readonly int Length => 17;
+		public const int ConstLength = 17;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray17(
 			Char field0
@@ -43162,8 +43507,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -43174,10 +43519,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray17) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray17)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray17)other);
 
         public readonly bool Equals(in FixedLengthCharArray17 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray17 left, in FixedLengthCharArray17 right)
             => left.Equals(right);
@@ -43189,7 +43534,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -43233,17 +43578,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray17 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray17 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray17 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray17 array, int index)
         {
@@ -43307,14 +43664,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray17 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray17 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray17 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray17 array1, in FixedLengthCharArray17 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -43326,19 +43675,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray17 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 18 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 18 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray18
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray18 _Zero = new FixedLengthCharArray18();
-		public static ref readonly FixedLengthCharArray18 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray18 _Zero = default;
+		public static ref readonly FixedLengthCharArray18 Zero => ref _Zero;
 
-		public readonly int Length => 18;
+		public const int ConstLength = 18;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray18(
 			Char field0
@@ -43452,8 +43801,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -43464,10 +43813,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray18) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray18)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray18)other);
 
         public readonly bool Equals(in FixedLengthCharArray18 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray18 left, in FixedLengthCharArray18 right)
             => left.Equals(right);
@@ -43479,7 +43828,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -43524,17 +43873,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray18 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray18 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray18 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray18 array, int index)
         {
@@ -43599,14 +43960,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray18 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray18 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray18 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray18 array1, in FixedLengthCharArray18 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -43618,19 +43971,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray18 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 19 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 19 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray19
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray19 _Zero = new FixedLengthCharArray19();
-		public static ref readonly FixedLengthCharArray19 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray19 _Zero = default;
+		public static ref readonly FixedLengthCharArray19 Zero => ref _Zero;
 
-		public readonly int Length => 19;
+		public const int ConstLength = 19;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray19(
 			Char field0
@@ -43749,8 +44102,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -43761,10 +44114,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray19) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray19)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray19)other);
 
         public readonly bool Equals(in FixedLengthCharArray19 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray19 left, in FixedLengthCharArray19 right)
             => left.Equals(right);
@@ -43776,7 +44129,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -43822,17 +44175,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray19 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray19 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray19 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray19 array, int index)
         {
@@ -43898,14 +44263,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray19 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray19 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray19 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray19 array1, in FixedLengthCharArray19 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -43917,19 +44274,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray19 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 20 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 20 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray20
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray20 _Zero = new FixedLengthCharArray20();
-		public static ref readonly FixedLengthCharArray20 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray20 _Zero = default;
+		public static ref readonly FixedLengthCharArray20 Zero => ref _Zero;
 
-		public readonly int Length => 20;
+		public const int ConstLength = 20;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray20(
 			Char field0
@@ -44053,8 +44410,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -44065,10 +44422,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray20) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray20)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray20)other);
 
         public readonly bool Equals(in FixedLengthCharArray20 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray20 left, in FixedLengthCharArray20 right)
             => left.Equals(right);
@@ -44080,7 +44437,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -44127,17 +44484,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray20 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray20 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray20 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray20 array, int index)
         {
@@ -44204,14 +44573,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray20 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray20 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray20 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray20 array1, in FixedLengthCharArray20 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -44223,19 +44584,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray20 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 21 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 21 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray21
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray21 _Zero = new FixedLengthCharArray21();
-		public static ref readonly FixedLengthCharArray21 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray21 _Zero = default;
+		public static ref readonly FixedLengthCharArray21 Zero => ref _Zero;
 
-		public readonly int Length => 21;
+		public const int ConstLength = 21;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray21(
 			Char field0
@@ -44364,8 +44725,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -44376,10 +44737,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray21) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray21)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray21)other);
 
         public readonly bool Equals(in FixedLengthCharArray21 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray21 left, in FixedLengthCharArray21 right)
             => left.Equals(right);
@@ -44391,7 +44752,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -44439,17 +44800,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray21 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray21 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray21 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray21 array, int index)
         {
@@ -44517,14 +44890,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray21 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray21 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray21 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray21 array1, in FixedLengthCharArray21 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -44536,19 +44901,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray21 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 22 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 22 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray22
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray22 _Zero = new FixedLengthCharArray22();
-		public static ref readonly FixedLengthCharArray22 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray22 _Zero = default;
+		public static ref readonly FixedLengthCharArray22 Zero => ref _Zero;
 
-		public readonly int Length => 22;
+		public const int ConstLength = 22;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray22(
 			Char field0
@@ -44682,8 +45047,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -44694,10 +45059,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray22) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray22)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray22)other);
 
         public readonly bool Equals(in FixedLengthCharArray22 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray22 left, in FixedLengthCharArray22 right)
             => left.Equals(right);
@@ -44709,7 +45074,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -44758,17 +45123,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray22 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray22 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray22 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray22 array, int index)
         {
@@ -44837,14 +45214,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray22 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray22 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray22 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray22 array1, in FixedLengthCharArray22 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -44856,19 +45225,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray22 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 23 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 23 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray23
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray23 _Zero = new FixedLengthCharArray23();
-		public static ref readonly FixedLengthCharArray23 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray23 _Zero = default;
+		public static ref readonly FixedLengthCharArray23 Zero => ref _Zero;
 
-		public readonly int Length => 23;
+		public const int ConstLength = 23;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray23(
 			Char field0
@@ -45007,8 +45376,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -45019,10 +45388,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray23) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray23)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray23)other);
 
         public readonly bool Equals(in FixedLengthCharArray23 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray23 left, in FixedLengthCharArray23 right)
             => left.Equals(right);
@@ -45034,7 +45403,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -45084,17 +45453,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray23 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray23 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray23 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray23 array, int index)
         {
@@ -45164,14 +45545,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray23 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray23 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray23 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray23 array1, in FixedLengthCharArray23 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -45183,19 +45556,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray23 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 24 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 24 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray24
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray24 _Zero = new FixedLengthCharArray24();
-		public static ref readonly FixedLengthCharArray24 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray24 _Zero = default;
+		public static ref readonly FixedLengthCharArray24 Zero => ref _Zero;
 
-		public readonly int Length => 24;
+		public const int ConstLength = 24;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray24(
 			Char field0
@@ -45339,8 +45712,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -45351,10 +45724,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray24) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray24)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray24)other);
 
         public readonly bool Equals(in FixedLengthCharArray24 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray24 left, in FixedLengthCharArray24 right)
             => left.Equals(right);
@@ -45366,7 +45739,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -45417,17 +45790,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray24 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray24 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray24 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray24 array, int index)
         {
@@ -45498,14 +45883,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray24 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray24 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray24 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray24 array1, in FixedLengthCharArray24 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -45517,19 +45894,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray24 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 25 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 25 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray25
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray25 _Zero = new FixedLengthCharArray25();
-		public static ref readonly FixedLengthCharArray25 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray25 _Zero = default;
+		public static ref readonly FixedLengthCharArray25 Zero => ref _Zero;
 
-		public readonly int Length => 25;
+		public const int ConstLength = 25;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray25(
 			Char field0
@@ -45678,8 +46055,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -45690,10 +46067,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray25) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray25)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray25)other);
 
         public readonly bool Equals(in FixedLengthCharArray25 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray25 left, in FixedLengthCharArray25 right)
             => left.Equals(right);
@@ -45705,7 +46082,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -45757,17 +46134,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray25 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray25 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray25 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray25 array, int index)
         {
@@ -45839,14 +46228,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray25 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray25 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray25 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray25 array1, in FixedLengthCharArray25 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -45858,19 +46239,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray25 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 26 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 26 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray26
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray26 _Zero = new FixedLengthCharArray26();
-		public static ref readonly FixedLengthCharArray26 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray26 _Zero = default;
+		public static ref readonly FixedLengthCharArray26 Zero => ref _Zero;
 
-		public readonly int Length => 26;
+		public const int ConstLength = 26;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray26(
 			Char field0
@@ -46024,8 +46405,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -46036,10 +46417,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray26) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray26)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray26)other);
 
         public readonly bool Equals(in FixedLengthCharArray26 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray26 left, in FixedLengthCharArray26 right)
             => left.Equals(right);
@@ -46051,7 +46432,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -46104,17 +46485,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray26 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray26 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray26 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray26 array, int index)
         {
@@ -46187,14 +46580,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray26 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray26 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray26 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray26 array1, in FixedLengthCharArray26 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -46206,19 +46591,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray26 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 27 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 27 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray27
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray27 _Zero = new FixedLengthCharArray27();
-		public static ref readonly FixedLengthCharArray27 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray27 _Zero = default;
+		public static ref readonly FixedLengthCharArray27 Zero => ref _Zero;
 
-		public readonly int Length => 27;
+		public const int ConstLength = 27;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray27(
 			Char field0
@@ -46377,8 +46762,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -46389,10 +46774,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray27) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray27)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray27)other);
 
         public readonly bool Equals(in FixedLengthCharArray27 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray27 left, in FixedLengthCharArray27 right)
             => left.Equals(right);
@@ -46404,7 +46789,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -46458,17 +46843,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray27 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray27 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray27 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray27 array, int index)
         {
@@ -46542,14 +46939,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray27 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray27 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray27 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray27 array1, in FixedLengthCharArray27 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -46561,19 +46950,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray27 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 28 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 28 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray28
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray28 _Zero = new FixedLengthCharArray28();
-		public static ref readonly FixedLengthCharArray28 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray28 _Zero = default;
+		public static ref readonly FixedLengthCharArray28 Zero => ref _Zero;
 
-		public readonly int Length => 28;
+		public const int ConstLength = 28;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray28(
 			Char field0
@@ -46737,8 +47126,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -46749,10 +47138,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray28) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray28)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray28)other);
 
         public readonly bool Equals(in FixedLengthCharArray28 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray28 left, in FixedLengthCharArray28 right)
             => left.Equals(right);
@@ -46764,7 +47153,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -46819,17 +47208,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray28 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray28 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray28 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray28 array, int index)
         {
@@ -46904,14 +47305,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray28 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray28 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray28 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray28 array1, in FixedLengthCharArray28 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -46923,19 +47316,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray28 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 29 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 29 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray29
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray29 _Zero = new FixedLengthCharArray29();
-		public static ref readonly FixedLengthCharArray29 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray29 _Zero = default;
+		public static ref readonly FixedLengthCharArray29 Zero => ref _Zero;
 
-		public readonly int Length => 29;
+		public const int ConstLength = 29;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray29(
 			Char field0
@@ -47104,8 +47497,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -47116,10 +47509,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray29) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray29)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray29)other);
 
         public readonly bool Equals(in FixedLengthCharArray29 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray29 left, in FixedLengthCharArray29 right)
             => left.Equals(right);
@@ -47131,7 +47524,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -47187,17 +47580,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray29 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray29 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray29 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray29 array, int index)
         {
@@ -47273,14 +47678,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray29 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray29 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray29 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray29 array1, in FixedLengthCharArray29 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -47292,19 +47689,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray29 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 30 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 30 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray30
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray30 _Zero = new FixedLengthCharArray30();
-		public static ref readonly FixedLengthCharArray30 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray30 _Zero = default;
+		public static ref readonly FixedLengthCharArray30 Zero => ref _Zero;
 
-		public readonly int Length => 30;
+		public const int ConstLength = 30;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray30(
 			Char field0
@@ -47478,8 +47875,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -47490,10 +47887,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray30) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray30)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray30)other);
 
         public readonly bool Equals(in FixedLengthCharArray30 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray30 left, in FixedLengthCharArray30 right)
             => left.Equals(right);
@@ -47505,7 +47902,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -47562,17 +47959,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray30 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray30 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray30 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray30 array, int index)
         {
@@ -47649,14 +48058,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray30 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray30 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray30 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray30 array1, in FixedLengthCharArray30 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -47668,19 +48069,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray30 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 31 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 31 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray31
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray31 _Zero = new FixedLengthCharArray31();
-		public static ref readonly FixedLengthCharArray31 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray31 _Zero = default;
+		public static ref readonly FixedLengthCharArray31 Zero => ref _Zero;
 
-		public readonly int Length => 31;
+		public const int ConstLength = 31;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray31(
 			Char field0
@@ -47859,8 +48260,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -47871,10 +48272,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray31) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray31)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray31)other);
 
         public readonly bool Equals(in FixedLengthCharArray31 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray31 left, in FixedLengthCharArray31 right)
             => left.Equals(right);
@@ -47886,7 +48287,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -47944,17 +48345,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray31 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray31 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray31 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray31 array, int index)
         {
@@ -48032,14 +48445,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray31 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray31 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray31 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray31 array1, in FixedLengthCharArray31 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -48051,19 +48456,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray31 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray32
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray32 _Zero = new FixedLengthCharArray32();
-		public static ref readonly FixedLengthCharArray32 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray32 _Zero = default;
+		public static ref readonly FixedLengthCharArray32 Zero => ref _Zero;
 
-		public readonly int Length => 32;
+		public const int ConstLength = 32;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray32(
 			Char field0
@@ -48247,8 +48652,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -48259,10 +48664,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray32) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray32)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray32)other);
 
         public readonly bool Equals(in FixedLengthCharArray32 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray32 left, in FixedLengthCharArray32 right)
             => left.Equals(right);
@@ -48274,7 +48679,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -48333,17 +48738,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray32 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray32 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray32 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray32 array, int index)
         {
@@ -48422,14 +48839,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray32 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray32 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray32 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray32 array1, in FixedLengthCharArray32 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -48441,19 +48850,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray32 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 33 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 33 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray33
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray33 _Zero = new FixedLengthCharArray33();
-		public static ref readonly FixedLengthCharArray33 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray33 _Zero = default;
+		public static ref readonly FixedLengthCharArray33 Zero => ref _Zero;
 
-		public readonly int Length => 33;
+		public const int ConstLength = 33;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray33(
 			Char field0
@@ -48642,8 +49051,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -48654,10 +49063,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray33) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray33)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray33)other);
 
         public readonly bool Equals(in FixedLengthCharArray33 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray33 left, in FixedLengthCharArray33 right)
             => left.Equals(right);
@@ -48669,7 +49078,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -48729,17 +49138,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray33 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray33 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray33 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray33 array, int index)
         {
@@ -48819,14 +49240,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray33 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray33 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray33 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray33 array1, in FixedLengthCharArray33 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -48838,19 +49251,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray33 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 34 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 34 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray34
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray34 _Zero = new FixedLengthCharArray34();
-		public static ref readonly FixedLengthCharArray34 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray34 _Zero = default;
+		public static ref readonly FixedLengthCharArray34 Zero => ref _Zero;
 
-		public readonly int Length => 34;
+		public const int ConstLength = 34;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray34(
 			Char field0
@@ -49044,8 +49457,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -49056,10 +49469,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray34) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray34)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray34)other);
 
         public readonly bool Equals(in FixedLengthCharArray34 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray34 left, in FixedLengthCharArray34 right)
             => left.Equals(right);
@@ -49071,7 +49484,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -49132,17 +49545,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray34 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray34 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray34 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray34 array, int index)
         {
@@ -49223,14 +49648,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray34 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray34 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray34 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray34 array1, in FixedLengthCharArray34 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -49242,19 +49659,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray34 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 35 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 35 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray35
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray35 _Zero = new FixedLengthCharArray35();
-		public static ref readonly FixedLengthCharArray35 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray35 _Zero = default;
+		public static ref readonly FixedLengthCharArray35 Zero => ref _Zero;
 
-		public readonly int Length => 35;
+		public const int ConstLength = 35;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray35(
 			Char field0
@@ -49453,8 +49870,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -49465,10 +49882,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray35) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray35)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray35)other);
 
         public readonly bool Equals(in FixedLengthCharArray35 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray35 left, in FixedLengthCharArray35 right)
             => left.Equals(right);
@@ -49480,7 +49897,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -49542,17 +49959,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray35 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray35 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray35 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray35 array, int index)
         {
@@ -49634,14 +50063,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray35 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray35 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray35 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray35 array1, in FixedLengthCharArray35 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -49653,19 +50074,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray35 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 36 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray36
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray36 _Zero = new FixedLengthCharArray36();
-		public static ref readonly FixedLengthCharArray36 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray36 _Zero = default;
+		public static ref readonly FixedLengthCharArray36 Zero => ref _Zero;
 
-		public readonly int Length => 36;
+		public const int ConstLength = 36;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray36(
 			Char field0
@@ -49869,8 +50290,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -49881,10 +50302,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray36) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray36)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray36)other);
 
         public readonly bool Equals(in FixedLengthCharArray36 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray36 left, in FixedLengthCharArray36 right)
             => left.Equals(right);
@@ -49896,7 +50317,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -49959,17 +50380,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray36 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray36 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray36 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray36 array, int index)
         {
@@ -50052,14 +50485,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray36 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray36 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray36 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray36 array1, in FixedLengthCharArray36 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -50071,19 +50496,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray36 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 37 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 37 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray37
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray37 _Zero = new FixedLengthCharArray37();
-		public static ref readonly FixedLengthCharArray37 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray37 _Zero = default;
+		public static ref readonly FixedLengthCharArray37 Zero => ref _Zero;
 
-		public readonly int Length => 37;
+		public const int ConstLength = 37;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray37(
 			Char field0
@@ -50292,8 +50717,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -50304,10 +50729,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray37) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray37)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray37)other);
 
         public readonly bool Equals(in FixedLengthCharArray37 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray37 left, in FixedLengthCharArray37 right)
             => left.Equals(right);
@@ -50319,7 +50744,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -50383,17 +50808,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray37 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray37 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray37 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray37 array, int index)
         {
@@ -50477,14 +50914,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray37 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray37 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray37 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray37 array1, in FixedLengthCharArray37 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -50496,19 +50925,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray37 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 38 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 38 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray38
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray38 _Zero = new FixedLengthCharArray38();
-		public static ref readonly FixedLengthCharArray38 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray38 _Zero = default;
+		public static ref readonly FixedLengthCharArray38 Zero => ref _Zero;
 
-		public readonly int Length => 38;
+		public const int ConstLength = 38;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray38(
 			Char field0
@@ -50722,8 +51151,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -50734,10 +51163,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray38) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray38)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray38)other);
 
         public readonly bool Equals(in FixedLengthCharArray38 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray38 left, in FixedLengthCharArray38 right)
             => left.Equals(right);
@@ -50749,7 +51178,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -50814,17 +51243,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray38 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray38 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray38 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray38 array, int index)
         {
@@ -50909,14 +51350,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray38 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray38 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray38 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray38 array1, in FixedLengthCharArray38 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -50928,19 +51361,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray38 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 39 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 39 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray39
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray39 _Zero = new FixedLengthCharArray39();
-		public static ref readonly FixedLengthCharArray39 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray39 _Zero = default;
+		public static ref readonly FixedLengthCharArray39 Zero => ref _Zero;
 
-		public readonly int Length => 39;
+		public const int ConstLength = 39;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray39(
 			Char field0
@@ -51159,8 +51592,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -51171,10 +51604,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray39) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray39)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray39)other);
 
         public readonly bool Equals(in FixedLengthCharArray39 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray39 left, in FixedLengthCharArray39 right)
             => left.Equals(right);
@@ -51186,7 +51619,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -51252,17 +51685,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray39 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray39 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray39 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray39 array, int index)
         {
@@ -51348,14 +51793,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray39 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray39 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray39 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray39 array1, in FixedLengthCharArray39 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -51367,19 +51804,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray39 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 40 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 40 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray40
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray40 _Zero = new FixedLengthCharArray40();
-		public static ref readonly FixedLengthCharArray40 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray40 _Zero = default;
+		public static ref readonly FixedLengthCharArray40 Zero => ref _Zero;
 
-		public readonly int Length => 40;
+		public const int ConstLength = 40;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray40(
 			Char field0
@@ -51603,8 +52040,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -51615,10 +52052,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray40) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray40)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray40)other);
 
         public readonly bool Equals(in FixedLengthCharArray40 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray40 left, in FixedLengthCharArray40 right)
             => left.Equals(right);
@@ -51630,7 +52067,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -51697,17 +52134,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray40 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray40 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray40 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray40 array, int index)
         {
@@ -51794,14 +52243,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray40 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray40 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray40 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray40 array1, in FixedLengthCharArray40 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -51813,19 +52254,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray40 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 41 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 41 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray41
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray41 _Zero = new FixedLengthCharArray41();
-		public static ref readonly FixedLengthCharArray41 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray41 _Zero = default;
+		public static ref readonly FixedLengthCharArray41 Zero => ref _Zero;
 
-		public readonly int Length => 41;
+		public const int ConstLength = 41;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray41(
 			Char field0
@@ -52054,8 +52495,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -52066,10 +52507,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray41) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray41)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray41)other);
 
         public readonly bool Equals(in FixedLengthCharArray41 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray41 left, in FixedLengthCharArray41 right)
             => left.Equals(right);
@@ -52081,7 +52522,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -52149,17 +52590,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray41 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray41 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray41 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray41 array, int index)
         {
@@ -52247,14 +52700,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray41 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray41 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray41 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray41 array1, in FixedLengthCharArray41 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -52266,19 +52711,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray41 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 42 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 42 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray42
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray42 _Zero = new FixedLengthCharArray42();
-		public static ref readonly FixedLengthCharArray42 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray42 _Zero = default;
+		public static ref readonly FixedLengthCharArray42 Zero => ref _Zero;
 
-		public readonly int Length => 42;
+		public const int ConstLength = 42;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray42(
 			Char field0
@@ -52512,8 +52957,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -52524,10 +52969,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray42) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray42)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray42)other);
 
         public readonly bool Equals(in FixedLengthCharArray42 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray42 left, in FixedLengthCharArray42 right)
             => left.Equals(right);
@@ -52539,7 +52984,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -52608,17 +53053,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray42 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray42 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray42 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray42 array, int index)
         {
@@ -52707,14 +53164,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray42 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray42 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray42 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray42 array1, in FixedLengthCharArray42 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -52726,19 +53175,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray42 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 43 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 43 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray43
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray43 _Zero = new FixedLengthCharArray43();
-		public static ref readonly FixedLengthCharArray43 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray43 _Zero = default;
+		public static ref readonly FixedLengthCharArray43 Zero => ref _Zero;
 
-		public readonly int Length => 43;
+		public const int ConstLength = 43;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray43(
 			Char field0
@@ -52977,8 +53426,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -52989,10 +53438,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray43) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray43)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray43)other);
 
         public readonly bool Equals(in FixedLengthCharArray43 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray43 left, in FixedLengthCharArray43 right)
             => left.Equals(right);
@@ -53004,7 +53453,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -53074,17 +53523,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray43 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray43 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray43 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray43 array, int index)
         {
@@ -53174,14 +53635,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray43 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray43 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray43 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray43 array1, in FixedLengthCharArray43 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -53193,19 +53646,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray43 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 44 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 44 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray44
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray44 _Zero = new FixedLengthCharArray44();
-		public static ref readonly FixedLengthCharArray44 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray44 _Zero = default;
+		public static ref readonly FixedLengthCharArray44 Zero => ref _Zero;
 
-		public readonly int Length => 44;
+		public const int ConstLength = 44;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray44(
 			Char field0
@@ -53449,8 +53902,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -53461,10 +53914,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray44) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray44)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray44)other);
 
         public readonly bool Equals(in FixedLengthCharArray44 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray44 left, in FixedLengthCharArray44 right)
             => left.Equals(right);
@@ -53476,7 +53929,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -53547,17 +54000,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray44 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray44 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray44 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray44 array, int index)
         {
@@ -53648,14 +54113,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray44 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray44 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray44 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray44 array1, in FixedLengthCharArray44 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -53667,19 +54124,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray44 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 45 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 45 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray45
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray45 _Zero = new FixedLengthCharArray45();
-		public static ref readonly FixedLengthCharArray45 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray45 _Zero = default;
+		public static ref readonly FixedLengthCharArray45 Zero => ref _Zero;
 
-		public readonly int Length => 45;
+		public const int ConstLength = 45;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray45(
 			Char field0
@@ -53928,8 +54385,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -53940,10 +54397,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray45) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray45)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray45)other);
 
         public readonly bool Equals(in FixedLengthCharArray45 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray45 left, in FixedLengthCharArray45 right)
             => left.Equals(right);
@@ -53955,7 +54412,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -54027,17 +54484,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray45 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray45 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray45 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray45 array, int index)
         {
@@ -54129,14 +54598,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray45 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray45 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray45 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray45 array1, in FixedLengthCharArray45 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -54148,19 +54609,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray45 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 46 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 46 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray46
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray46 _Zero = new FixedLengthCharArray46();
-		public static ref readonly FixedLengthCharArray46 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray46 _Zero = default;
+		public static ref readonly FixedLengthCharArray46 Zero => ref _Zero;
 
-		public readonly int Length => 46;
+		public const int ConstLength = 46;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray46(
 			Char field0
@@ -54414,8 +54875,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -54426,10 +54887,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray46) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray46)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray46)other);
 
         public readonly bool Equals(in FixedLengthCharArray46 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray46 left, in FixedLengthCharArray46 right)
             => left.Equals(right);
@@ -54441,7 +54902,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -54514,17 +54975,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray46 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray46 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray46 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray46 array, int index)
         {
@@ -54617,14 +55090,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray46 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray46 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray46 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray46 array1, in FixedLengthCharArray46 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -54636,19 +55101,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray46 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 47 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 47 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray47
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray47 _Zero = new FixedLengthCharArray47();
-		public static ref readonly FixedLengthCharArray47 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray47 _Zero = default;
+		public static ref readonly FixedLengthCharArray47 Zero => ref _Zero;
 
-		public readonly int Length => 47;
+		public const int ConstLength = 47;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray47(
 			Char field0
@@ -54907,8 +55372,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -54919,10 +55384,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray47) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray47)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray47)other);
 
         public readonly bool Equals(in FixedLengthCharArray47 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray47 left, in FixedLengthCharArray47 right)
             => left.Equals(right);
@@ -54934,7 +55399,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -55008,17 +55473,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray47 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray47 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray47 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray47 array, int index)
         {
@@ -55112,14 +55589,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray47 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray47 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray47 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray47 array1, in FixedLengthCharArray47 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -55131,19 +55600,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray47 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 48 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray48
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray48 _Zero = new FixedLengthCharArray48();
-		public static ref readonly FixedLengthCharArray48 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray48 _Zero = default;
+		public static ref readonly FixedLengthCharArray48 Zero => ref _Zero;
 
-		public readonly int Length => 48;
+		public const int ConstLength = 48;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray48(
 			Char field0
@@ -55407,8 +55876,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -55419,10 +55888,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray48) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray48)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray48)other);
 
         public readonly bool Equals(in FixedLengthCharArray48 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray48 left, in FixedLengthCharArray48 right)
             => left.Equals(right);
@@ -55434,7 +55903,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -55509,17 +55978,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray48 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray48 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray48 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray48 array, int index)
         {
@@ -55614,14 +56095,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray48 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray48 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray48 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray48 array1, in FixedLengthCharArray48 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -55633,19 +56106,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray48 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 49 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 49 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray49
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray49 _Zero = new FixedLengthCharArray49();
-		public static ref readonly FixedLengthCharArray49 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray49 _Zero = default;
+		public static ref readonly FixedLengthCharArray49 Zero => ref _Zero;
 
-		public readonly int Length => 49;
+		public const int ConstLength = 49;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray49(
 			Char field0
@@ -55914,8 +56387,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -55926,10 +56399,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray49) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray49)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray49)other);
 
         public readonly bool Equals(in FixedLengthCharArray49 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray49 left, in FixedLengthCharArray49 right)
             => left.Equals(right);
@@ -55941,7 +56414,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -56017,17 +56490,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray49 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray49 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray49 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray49 array, int index)
         {
@@ -56123,14 +56608,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray49 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray49 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray49 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray49 array1, in FixedLengthCharArray49 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -56142,19 +56619,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray49 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 50 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 50 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray50
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray50 _Zero = new FixedLengthCharArray50();
-		public static ref readonly FixedLengthCharArray50 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray50 _Zero = default;
+		public static ref readonly FixedLengthCharArray50 Zero => ref _Zero;
 
-		public readonly int Length => 50;
+		public const int ConstLength = 50;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray50(
 			Char field0
@@ -56428,8 +56905,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -56440,10 +56917,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray50) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray50)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray50)other);
 
         public readonly bool Equals(in FixedLengthCharArray50 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray50 left, in FixedLengthCharArray50 right)
             => left.Equals(right);
@@ -56455,7 +56932,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -56532,17 +57009,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray50 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray50 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray50 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray50 array, int index)
         {
@@ -56639,14 +57128,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray50 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray50 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray50 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray50 array1, in FixedLengthCharArray50 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -56658,19 +57139,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray50 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 51 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 51 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray51
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray51 _Zero = new FixedLengthCharArray51();
-		public static ref readonly FixedLengthCharArray51 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray51 _Zero = default;
+		public static ref readonly FixedLengthCharArray51 Zero => ref _Zero;
 
-		public readonly int Length => 51;
+		public const int ConstLength = 51;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray51(
 			Char field0
@@ -56949,8 +57430,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -56961,10 +57442,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray51) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray51)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray51)other);
 
         public readonly bool Equals(in FixedLengthCharArray51 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray51 left, in FixedLengthCharArray51 right)
             => left.Equals(right);
@@ -56976,7 +57457,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -57054,17 +57535,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray51 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray51 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray51 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray51 array, int index)
         {
@@ -57162,14 +57655,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray51 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray51 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray51 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray51 array1, in FixedLengthCharArray51 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -57181,19 +57666,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray51 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 52 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 52 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray52
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray52 _Zero = new FixedLengthCharArray52();
-		public static ref readonly FixedLengthCharArray52 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray52 _Zero = default;
+		public static ref readonly FixedLengthCharArray52 Zero => ref _Zero;
 
-		public readonly int Length => 52;
+		public const int ConstLength = 52;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray52(
 			Char field0
@@ -57477,8 +57962,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -57489,10 +57974,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray52) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray52)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray52)other);
 
         public readonly bool Equals(in FixedLengthCharArray52 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray52 left, in FixedLengthCharArray52 right)
             => left.Equals(right);
@@ -57504,7 +57989,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -57583,17 +58068,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray52 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray52 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray52 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray52 array, int index)
         {
@@ -57692,14 +58189,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray52 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray52 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray52 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray52 array1, in FixedLengthCharArray52 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -57711,19 +58200,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray52 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 53 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 53 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray53
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray53 _Zero = new FixedLengthCharArray53();
-		public static ref readonly FixedLengthCharArray53 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray53 _Zero = default;
+		public static ref readonly FixedLengthCharArray53 Zero => ref _Zero;
 
-		public readonly int Length => 53;
+		public const int ConstLength = 53;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray53(
 			Char field0
@@ -58012,8 +58501,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -58024,10 +58513,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray53) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray53)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray53)other);
 
         public readonly bool Equals(in FixedLengthCharArray53 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray53 left, in FixedLengthCharArray53 right)
             => left.Equals(right);
@@ -58039,7 +58528,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -58119,17 +58608,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray53 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray53 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray53 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray53 array, int index)
         {
@@ -58229,14 +58730,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray53 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray53 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray53 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray53 array1, in FixedLengthCharArray53 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -58248,19 +58741,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray53 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 54 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 54 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray54
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray54 _Zero = new FixedLengthCharArray54();
-		public static ref readonly FixedLengthCharArray54 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray54 _Zero = default;
+		public static ref readonly FixedLengthCharArray54 Zero => ref _Zero;
 
-		public readonly int Length => 54;
+		public const int ConstLength = 54;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray54(
 			Char field0
@@ -58554,8 +59047,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -58566,10 +59059,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray54) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray54)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray54)other);
 
         public readonly bool Equals(in FixedLengthCharArray54 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray54 left, in FixedLengthCharArray54 right)
             => left.Equals(right);
@@ -58581,7 +59074,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -58662,17 +59155,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray54 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray54 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray54 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray54 array, int index)
         {
@@ -58773,14 +59278,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray54 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray54 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray54 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray54 array1, in FixedLengthCharArray54 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -58792,19 +59289,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray54 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 55 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 55 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray55
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray55 _Zero = new FixedLengthCharArray55();
-		public static ref readonly FixedLengthCharArray55 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray55 _Zero = default;
+		public static ref readonly FixedLengthCharArray55 Zero => ref _Zero;
 
-		public readonly int Length => 55;
+		public const int ConstLength = 55;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray55(
 			Char field0
@@ -59103,8 +59600,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -59115,10 +59612,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray55) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray55)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray55)other);
 
         public readonly bool Equals(in FixedLengthCharArray55 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray55 left, in FixedLengthCharArray55 right)
             => left.Equals(right);
@@ -59130,7 +59627,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -59212,17 +59709,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray55 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray55 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray55 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray55 array, int index)
         {
@@ -59324,14 +59833,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray55 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray55 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray55 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray55 array1, in FixedLengthCharArray55 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -59343,19 +59844,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray55 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 56 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 56 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray56
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray56 _Zero = new FixedLengthCharArray56();
-		public static ref readonly FixedLengthCharArray56 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray56 _Zero = default;
+		public static ref readonly FixedLengthCharArray56 Zero => ref _Zero;
 
-		public readonly int Length => 56;
+		public const int ConstLength = 56;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray56(
 			Char field0
@@ -59659,8 +60160,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -59671,10 +60172,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray56) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray56)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray56)other);
 
         public readonly bool Equals(in FixedLengthCharArray56 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray56 left, in FixedLengthCharArray56 right)
             => left.Equals(right);
@@ -59686,7 +60187,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -59769,17 +60270,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray56 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray56 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray56 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray56 array, int index)
         {
@@ -59882,14 +60395,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray56 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray56 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray56 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray56 array1, in FixedLengthCharArray56 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -59901,19 +60406,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray56 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 57 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 57 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray57
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray57 _Zero = new FixedLengthCharArray57();
-		public static ref readonly FixedLengthCharArray57 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray57 _Zero = default;
+		public static ref readonly FixedLengthCharArray57 Zero => ref _Zero;
 
-		public readonly int Length => 57;
+		public const int ConstLength = 57;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray57(
 			Char field0
@@ -60222,8 +60727,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -60234,10 +60739,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray57) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray57)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray57)other);
 
         public readonly bool Equals(in FixedLengthCharArray57 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray57 left, in FixedLengthCharArray57 right)
             => left.Equals(right);
@@ -60249,7 +60754,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -60333,17 +60838,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray57 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray57 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray57 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray57 array, int index)
         {
@@ -60447,14 +60964,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray57 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray57 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray57 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray57 array1, in FixedLengthCharArray57 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -60466,19 +60975,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray57 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 58 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 58 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray58
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray58 _Zero = new FixedLengthCharArray58();
-		public static ref readonly FixedLengthCharArray58 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray58 _Zero = default;
+		public static ref readonly FixedLengthCharArray58 Zero => ref _Zero;
 
-		public readonly int Length => 58;
+		public const int ConstLength = 58;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray58(
 			Char field0
@@ -60792,8 +61301,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -60804,10 +61313,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray58) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray58)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray58)other);
 
         public readonly bool Equals(in FixedLengthCharArray58 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray58 left, in FixedLengthCharArray58 right)
             => left.Equals(right);
@@ -60819,7 +61328,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -60904,17 +61413,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray58 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray58 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray58 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray58 array, int index)
         {
@@ -61019,14 +61540,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray58 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray58 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray58 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray58 array1, in FixedLengthCharArray58 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -61038,19 +61551,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray58 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 59 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 59 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray59
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray59 _Zero = new FixedLengthCharArray59();
-		public static ref readonly FixedLengthCharArray59 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray59 _Zero = default;
+		public static ref readonly FixedLengthCharArray59 Zero => ref _Zero;
 
-		public readonly int Length => 59;
+		public const int ConstLength = 59;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray59(
 			Char field0
@@ -61369,8 +61882,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -61381,10 +61894,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray59) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray59)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray59)other);
 
         public readonly bool Equals(in FixedLengthCharArray59 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray59 left, in FixedLengthCharArray59 right)
             => left.Equals(right);
@@ -61396,7 +61909,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -61482,17 +61995,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray59 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray59 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray59 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray59 array, int index)
         {
@@ -61598,14 +62123,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray59 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray59 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray59 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray59 array1, in FixedLengthCharArray59 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -61617,19 +62134,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray59 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 60 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 60 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray60
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray60 _Zero = new FixedLengthCharArray60();
-		public static ref readonly FixedLengthCharArray60 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray60 _Zero = default;
+		public static ref readonly FixedLengthCharArray60 Zero => ref _Zero;
 
-		public readonly int Length => 60;
+		public const int ConstLength = 60;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray60(
 			Char field0
@@ -61953,8 +62470,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -61965,10 +62482,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray60) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray60)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray60)other);
 
         public readonly bool Equals(in FixedLengthCharArray60 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray60 left, in FixedLengthCharArray60 right)
             => left.Equals(right);
@@ -61980,7 +62497,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -62067,17 +62584,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray60 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray60 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray60 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray60 array, int index)
         {
@@ -62184,14 +62713,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray60 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray60 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray60 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray60 array1, in FixedLengthCharArray60 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -62203,19 +62724,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray60 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 61 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 61 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray61
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray61 _Zero = new FixedLengthCharArray61();
-		public static ref readonly FixedLengthCharArray61 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray61 _Zero = default;
+		public static ref readonly FixedLengthCharArray61 Zero => ref _Zero;
 
-		public readonly int Length => 61;
+		public const int ConstLength = 61;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray61(
 			Char field0
@@ -62544,8 +63065,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -62556,10 +63077,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray61) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray61)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray61)other);
 
         public readonly bool Equals(in FixedLengthCharArray61 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray61 left, in FixedLengthCharArray61 right)
             => left.Equals(right);
@@ -62571,7 +63092,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -62659,17 +63180,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray61 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray61 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray61 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray61 array, int index)
         {
@@ -62777,14 +63310,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray61 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray61 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray61 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray61 array1, in FixedLengthCharArray61 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -62796,19 +63321,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray61 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 62 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 62 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray62
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray62 _Zero = new FixedLengthCharArray62();
-		public static ref readonly FixedLengthCharArray62 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray62 _Zero = default;
+		public static ref readonly FixedLengthCharArray62 Zero => ref _Zero;
 
-		public readonly int Length => 62;
+		public const int ConstLength = 62;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray62(
 			Char field0
@@ -63142,8 +63667,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -63154,10 +63679,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray62) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray62)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray62)other);
 
         public readonly bool Equals(in FixedLengthCharArray62 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray62 left, in FixedLengthCharArray62 right)
             => left.Equals(right);
@@ -63169,7 +63694,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -63258,17 +63783,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray62 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray62 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray62 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray62 array, int index)
         {
@@ -63377,14 +63914,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray62 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray62 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray62 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray62 array1, in FixedLengthCharArray62 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -63396,19 +63925,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray62 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 63 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 63 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray63
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray63 _Zero = new FixedLengthCharArray63();
-		public static ref readonly FixedLengthCharArray63 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray63 _Zero = default;
+		public static ref readonly FixedLengthCharArray63 Zero => ref _Zero;
 
-		public readonly int Length => 63;
+		public const int ConstLength = 63;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray63(
 			Char field0
@@ -63747,8 +64276,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -63759,10 +64288,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray63) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray63)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray63)other);
 
         public readonly bool Equals(in FixedLengthCharArray63 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray63 left, in FixedLengthCharArray63 right)
             => left.Equals(right);
@@ -63774,7 +64303,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -63864,17 +64393,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray63 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray63 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray63 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray63 array, int index)
         {
@@ -63984,14 +64525,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray63 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray63 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray63 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray63 array1, in FixedLengthCharArray63 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -64003,19 +64536,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray63 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 64 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 64 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray64
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray64 _Zero = new FixedLengthCharArray64();
-		public static ref readonly FixedLengthCharArray64 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray64 _Zero = default;
+		public static ref readonly FixedLengthCharArray64 Zero => ref _Zero;
 
-		public readonly int Length => 64;
+		public const int ConstLength = 64;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray64(
 			Char field0
@@ -64359,8 +64892,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -64371,10 +64904,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray64) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray64)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray64)other);
 
         public readonly bool Equals(in FixedLengthCharArray64 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray64 left, in FixedLengthCharArray64 right)
             => left.Equals(right);
@@ -64386,7 +64919,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -64477,17 +65010,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray64 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray64 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray64 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray64 array, int index)
         {
@@ -64598,14 +65143,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray64 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray64 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray64 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray64 array1, in FixedLengthCharArray64 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -64617,19 +65154,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray64 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 65 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 65 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray65
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray65 _Zero = new FixedLengthCharArray65();
-		public static ref readonly FixedLengthCharArray65 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray65 _Zero = default;
+		public static ref readonly FixedLengthCharArray65 Zero => ref _Zero;
 
-		public readonly int Length => 65;
+		public const int ConstLength = 65;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray65(
 			Char field0
@@ -64978,8 +65515,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -64990,10 +65527,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray65) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray65)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray65)other);
 
         public readonly bool Equals(in FixedLengthCharArray65 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray65 left, in FixedLengthCharArray65 right)
             => left.Equals(right);
@@ -65005,7 +65542,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -65097,17 +65634,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray65 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray65 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray65 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray65 array, int index)
         {
@@ -65219,14 +65768,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray65 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray65 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray65 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray65 array1, in FixedLengthCharArray65 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -65238,19 +65779,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray65 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 66 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 66 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray66
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray66 _Zero = new FixedLengthCharArray66();
-		public static ref readonly FixedLengthCharArray66 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray66 _Zero = default;
+		public static ref readonly FixedLengthCharArray66 Zero => ref _Zero;
 
-		public readonly int Length => 66;
+		public const int ConstLength = 66;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray66(
 			Char field0
@@ -65604,8 +66145,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -65616,10 +66157,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray66) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray66)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray66)other);
 
         public readonly bool Equals(in FixedLengthCharArray66 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray66 left, in FixedLengthCharArray66 right)
             => left.Equals(right);
@@ -65631,7 +66172,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -65724,17 +66265,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray66 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray66 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray66 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray66 array, int index)
         {
@@ -65847,14 +66400,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray66 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray66 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray66 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray66 array1, in FixedLengthCharArray66 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -65866,19 +66411,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray66 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 260 * sizeof(Char))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 260 * sizeof(Char), CharSet = CharSet.Unicode)]
 	public struct FixedLengthCharArray260
 #if GENERATE_ENUMERABLE
 		: IEnumerable<Char>
 #endif
 	{
-		private static readonly FixedLengthCharArray260 _Zero = new FixedLengthCharArray260();
-		public static ref readonly FixedLengthCharArray260 RefToZero => ref _Zero;
+		private static readonly FixedLengthCharArray260 _Zero = default;
+		public static ref readonly FixedLengthCharArray260 Zero => ref _Zero;
 
-		public readonly int Length => 260;
+		public const int ConstLength = 260;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthCharArray260(
 			Char field0
@@ -67202,8 +67747,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -67214,10 +67759,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthCharArray260) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthCharArray260)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthCharArray260)other);
 
         public readonly bool Equals(in FixedLengthCharArray260 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthCharArray260 left, in FixedLengthCharArray260 right)
             => left.Equals(right);
@@ -67229,7 +67774,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -67516,17 +68061,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<Char>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<Char>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<Char>(in FixedLengthCharArray260 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<Char> AsSpan(this ref FixedLengthCharArray260 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray260 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref Char At(this ref FixedLengthCharArray260 array, int index)
         {
@@ -67833,14 +68390,6 @@ namespace FixedLengthArray
         public static ref Char At(this ref FixedLengthCharArray260 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<Char> AsSpan(this ref FixedLengthCharArray260 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<Char> AsReadOnlySpan(this in FixedLengthCharArray260 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthCharArray260 array1, in FixedLengthCharArray260 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -67852,19 +68401,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthCharArray260 array, Char value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(UInt32))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 2 * sizeof(UInt32), CharSet = CharSet.Unicode)]
 	public struct FixedLengthUInt32Array2
 #if GENERATE_ENUMERABLE
 		: IEnumerable<UInt32>
 #endif
 	{
-		private static readonly FixedLengthUInt32Array2 _Zero = new FixedLengthUInt32Array2();
-		public static ref readonly FixedLengthUInt32Array2 RefToZero => ref _Zero;
+		private static readonly FixedLengthUInt32Array2 _Zero = default;
+		public static ref readonly FixedLengthUInt32Array2 Zero => ref _Zero;
 
-		public readonly int Length => 2;
+		public const int ConstLength = 2;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthUInt32Array2(
 			UInt32 field0
@@ -67898,8 +68447,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -67910,10 +68459,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthUInt32Array2) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthUInt32Array2)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthUInt32Array2)other);
 
         public readonly bool Equals(in FixedLengthUInt32Array2 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthUInt32Array2 left, in FixedLengthUInt32Array2 right)
             => left.Equals(right);
@@ -67925,7 +68474,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -67954,17 +68503,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<UInt32>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<UInt32>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<UInt32>(in FixedLengthUInt32Array2 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array2 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array2 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref UInt32 At(this ref FixedLengthUInt32Array2 array, int index)
         {
@@ -68013,14 +68574,6 @@ namespace FixedLengthArray
         public static ref UInt32 At(this ref FixedLengthUInt32Array2 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array2 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array2 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthUInt32Array2 array1, in FixedLengthUInt32Array2 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -68032,19 +68585,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthUInt32Array2 array, UInt32 value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(UInt32))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 4 * sizeof(UInt32), CharSet = CharSet.Unicode)]
 	public struct FixedLengthUInt32Array4
 #if GENERATE_ENUMERABLE
 		: IEnumerable<UInt32>
 #endif
 	{
-		private static readonly FixedLengthUInt32Array4 _Zero = new FixedLengthUInt32Array4();
-		public static ref readonly FixedLengthUInt32Array4 RefToZero => ref _Zero;
+		private static readonly FixedLengthUInt32Array4 _Zero = default;
+		public static ref readonly FixedLengthUInt32Array4 Zero => ref _Zero;
 
-		public readonly int Length => 4;
+		public const int ConstLength = 4;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthUInt32Array4(
 			UInt32 field0
@@ -68088,8 +68641,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -68100,10 +68653,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthUInt32Array4) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthUInt32Array4)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthUInt32Array4)other);
 
         public readonly bool Equals(in FixedLengthUInt32Array4 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthUInt32Array4 left, in FixedLengthUInt32Array4 right)
             => left.Equals(right);
@@ -68115,7 +68668,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -68146,17 +68699,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<UInt32>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<UInt32>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<UInt32>(in FixedLengthUInt32Array4 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array4 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array4 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref UInt32 At(this ref FixedLengthUInt32Array4 array, int index)
         {
@@ -68207,14 +68772,6 @@ namespace FixedLengthArray
         public static ref UInt32 At(this ref FixedLengthUInt32Array4 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array4 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array4 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthUInt32Array4 array1, in FixedLengthUInt32Array4 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -68226,19 +68783,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthUInt32Array4 array, UInt32 value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(UInt32))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 8 * sizeof(UInt32), CharSet = CharSet.Unicode)]
 	public struct FixedLengthUInt32Array8
 #if GENERATE_ENUMERABLE
 		: IEnumerable<UInt32>
 #endif
 	{
-		private static readonly FixedLengthUInt32Array8 _Zero = new FixedLengthUInt32Array8();
-		public static ref readonly FixedLengthUInt32Array8 RefToZero => ref _Zero;
+		private static readonly FixedLengthUInt32Array8 _Zero = default;
+		public static ref readonly FixedLengthUInt32Array8 Zero => ref _Zero;
 
-		public readonly int Length => 8;
+		public const int ConstLength = 8;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthUInt32Array8(
 			UInt32 field0
@@ -68302,8 +68859,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -68314,10 +68871,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthUInt32Array8) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthUInt32Array8)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthUInt32Array8)other);
 
         public readonly bool Equals(in FixedLengthUInt32Array8 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthUInt32Array8 left, in FixedLengthUInt32Array8 right)
             => left.Equals(right);
@@ -68329,7 +68886,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -68364,17 +68921,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<UInt32>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<UInt32>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<UInt32>(in FixedLengthUInt32Array8 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array8 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array8 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref UInt32 At(this ref FixedLengthUInt32Array8 array, int index)
         {
@@ -68429,14 +68998,6 @@ namespace FixedLengthArray
         public static ref UInt32 At(this ref FixedLengthUInt32Array8 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array8 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array8 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthUInt32Array8 array1, in FixedLengthUInt32Array8 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -68448,19 +69009,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthUInt32Array8 array, UInt32 value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(UInt32))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16 * sizeof(UInt32), CharSet = CharSet.Unicode)]
 	public struct FixedLengthUInt32Array16
 #if GENERATE_ENUMERABLE
 		: IEnumerable<UInt32>
 #endif
 	{
-		private static readonly FixedLengthUInt32Array16 _Zero = new FixedLengthUInt32Array16();
-		public static ref readonly FixedLengthUInt32Array16 RefToZero => ref _Zero;
+		private static readonly FixedLengthUInt32Array16 _Zero = default;
+		public static ref readonly FixedLengthUInt32Array16 Zero => ref _Zero;
 
-		public readonly int Length => 16;
+		public const int ConstLength = 16;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthUInt32Array16(
 			UInt32 field0
@@ -68564,8 +69125,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -68576,10 +69137,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthUInt32Array16) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthUInt32Array16)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthUInt32Array16)other);
 
         public readonly bool Equals(in FixedLengthUInt32Array16 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthUInt32Array16 left, in FixedLengthUInt32Array16 right)
             => left.Equals(right);
@@ -68591,7 +69152,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -68634,17 +69195,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<UInt32>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<UInt32>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<UInt32>(in FixedLengthUInt32Array16 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array16 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array16 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref UInt32 At(this ref FixedLengthUInt32Array16 array, int index)
         {
@@ -68707,14 +69280,6 @@ namespace FixedLengthArray
         public static ref UInt32 At(this ref FixedLengthUInt32Array16 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array16 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array16 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthUInt32Array16 array1, in FixedLengthUInt32Array16 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -68726,19 +69291,19 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthUInt32Array16 array, UInt32 value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(UInt32))]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 32 * sizeof(UInt32), CharSet = CharSet.Unicode)]
 	public struct FixedLengthUInt32Array32
 #if GENERATE_ENUMERABLE
 		: IEnumerable<UInt32>
 #endif
 	{
-		private static readonly FixedLengthUInt32Array32 _Zero = new FixedLengthUInt32Array32();
-		public static ref readonly FixedLengthUInt32Array32 RefToZero => ref _Zero;
+		private static readonly FixedLengthUInt32Array32 _Zero = default;
+		public static ref readonly FixedLengthUInt32Array32 Zero => ref _Zero;
 
-		public readonly int Length => 32;
+		public const int ConstLength = 32;
+		public readonly int Length => ConstLength;
 #if GENERATE_CTOR
 		public FixedLengthUInt32Array32(
 			UInt32 field0
@@ -68922,8 +69487,8 @@ namespace FixedLengthArray
                 }
             }
 #elif GENERATE_ASSPAN
-			readonly get => FixedLengthArrayExtention.AsReadOnlySpan(in this)[index];
-			set => FixedLengthArrayExtention.AsSpan(ref this)[index] = value;
+			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
+			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
 #else
             readonly get => (index < Length) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
                     throw new ArgumentOutOfRangeException(nameof(index));
@@ -68934,10 +69499,10 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
         public readonly override bool Equals(object other)
             => other is null || !(other is FixedLengthUInt32Array32) ? false :
-			   FixedLengthArrayExtention.Equals(in this, (FixedLengthUInt32Array32)other);
+			   FixedLengthArrayExtension.Equals(in this, (FixedLengthUInt32Array32)other);
 
         public readonly bool Equals(in FixedLengthUInt32Array32 other)
-			=> FixedLengthArrayExtention.Equals(in this, in other);
+			=> FixedLengthArrayExtension.Equals(in this, in other);
 		
         public static bool operator ==(in FixedLengthUInt32Array32 left, in FixedLengthUInt32Array32 right)
             => left.Equals(right);
@@ -68949,7 +69514,7 @@ namespace FixedLengthArray
 #if GENERATE_ASSPAN
         public override readonly int GetHashCode()
         {
-			var span = FixedLengthArrayExtention.AsReadOnlySpan(this);
+			var span = FixedLengthArrayExtension.AsReadOnlySpan(this);
 			int hash = 0;
             for(int i = 0; i < span.Length;i++ )
 			{
@@ -69008,17 +69573,29 @@ namespace FixedLengthArray
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<UInt32>)this).GetEnumerator();
-
 #endif
 
 #if GENERATE_ASSPAN
 		public readonly ReadOnlySpan<UInt32>.Enumerator GetEnumerator()
-			=> FixedLengthArrayExtention.AsReadOnlySpan(this).GetEnumerator();
+			=> FixedLengthArrayExtension.AsReadOnlySpan(this).GetEnumerator();
+
+        public static implicit operator ReadOnlySpan<UInt32>(in FixedLengthUInt32Array32 self)
+            => self.AsReadOnlySpan();
 #endif
 	}
 
-    public static partial class FixedLengthArrayExtention
+    public static partial class FixedLengthArrayExtension
     {
+#if GENERATE_ASSPAN
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array32 array)
+            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
+
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array32 array)
+            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
+#endif
+
 #if GENERATE_ALL_FIELDS 
         public static ref UInt32 At(this ref FixedLengthUInt32Array32 array, int index)
         {
@@ -69097,14 +69674,6 @@ namespace FixedLengthArray
         public static ref UInt32 At(this ref FixedLengthUInt32Array32 array, int index)
             => ref AsSpan(ref array)[index];
 
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static Span<UInt32> AsSpan(this ref FixedLengthUInt32Array32 array)
-            => FixedLengthArray.CreateSpan(ref array.Field0, array.Length);
-
-		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public static ReadOnlySpan<UInt32> AsReadOnlySpan(this in FixedLengthUInt32Array32 array)
-            => FixedLengthArray.CreateReadOnlySpan(array.Field0, array.Length);
-
         public static int CompareTo(this in FixedLengthUInt32Array32 array1, in FixedLengthUInt32Array32 array2)
 			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
 
@@ -69116,7 +69685,6 @@ namespace FixedLengthArray
 
         public static void Fill(this ref FixedLengthUInt32Array32 array, UInt32 value = default)
             => AsSpan(ref array).Fill(value);
-
 #endif
     }
 }
