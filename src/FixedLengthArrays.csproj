@@ -13,6 +13,8 @@
    <PackageProjectUrl>https://github.com/udaken/FixedLengthArrays</PackageProjectUrl>
    <PackageId>FixedLengthArrays</PackageId>
    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+   <AssemblyVersion>1.0.1.0</AssemblyVersion>
+   <Version>1.0.1</Version>
 
   </PropertyGroup>
 

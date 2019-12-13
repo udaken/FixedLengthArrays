@@ -11,7 +11,7 @@ namespace FixedLengthArrayTest
         public void TestMethod1()
         {
             var a = new FixedLengthByteArray3();
-            Assert.IsTrue(a.Equals(in FixedLengthByteArray3.RefToZero));
+            Assert.IsTrue(a.Equals(in FixedLengthByteArray3.Zero));
             var b = new FixedLengthByteArray3();
             Assert.AreEqual(a, b);
             Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
