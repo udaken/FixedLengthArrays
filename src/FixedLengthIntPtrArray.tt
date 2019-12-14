@@ -4,16 +4,9 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
-//#define GENERATE_ALL_FIELDS
 //#define GENERATE_ENUMERABLE
 //#define GENERATE_CTOR
 #define GENERATE_ASSPAN
-
-#if !GENERATE_ALL_FIELDS
-	#if GENERATE_CTOR
-	#error Configuration Error
-	#endif
-#endif
 
 using System;
 using System.Collections.Generic;
@@ -23,30 +16,15 @@ using System.Runtime.CompilerServices;
 namespace FixedLengthArray
 {
 <#foreach((var elementType,var length) in 
-	(Enumerable.Range(2,64)
-		.Append(96)
-		.Append(128)
-		.Append(192)
-		.Append(256)
-		.Append(260)
-		.Append(384)
-	.Append(512).Select(elem => (elementType: "Byte", Count: elem)))
-	.Concat(Enumerable.Range(2,64+1).Append(260).Select(elem => (elementType: "Char", Count: elem)))
-	.Concat(new []{2,4,8,16,32}.Select(elem => (elementType: "UInt32", Count: elem)))
-
+	(new []{2,3,4,5,6,7,8,16,32}.Select(elem => (elementType: "IntPtr", Count: elem)))
 	) {
 	var generatedTypeName = "FixedLength" + elementType + "Array" + length;
 #>
-    [StructLayout(LayoutKind.Sequential, Pack = 1, Size = <#=length#> * sizeof(<#=elementType#>), CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 	public struct <#=generatedTypeName#> : IFixedLengthArray<<#=elementType#>>
-#if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
 		, IEquatable<<#=generatedTypeName#>>
 		, IEquatableByRef<<#=generatedTypeName#>>
-#endif
 	{
-		private static readonly <#=generatedTypeName#> _Zero = default;
-		public static ref readonly <#=generatedTypeName#> Zero => ref _Zero;
-
 		public const int ConstLength = <#=length#>;
 		public readonly int Length => ConstLength;
 		readonly int IReadOnlyCollection<<#=elementType#>>.Count => ConstLength;
@@ -66,17 +44,16 @@ namespace FixedLengthArray
 #endif
 
 		public <#=elementType#> Field0;
-#if GENERATE_ALL_FIELDS
 <#for(var j = 1; j < length; j++){#>
 		public <#=elementType#> Field<#=j#>;
 <#}#>
-#endif
+
         public <#=elementType#> this[int index]
         {
 #if GENERATE_ASSPAN
 			readonly get => FixedLengthArrayExtension.AsReadOnlySpan(in this)[index];
 			set => FixedLengthArrayExtension.AsSpan(ref this)[index] = value;
-#elif GENERATE_ALL_FIELDS
+#else
             readonly get => index switch
             {
 <#for(var j = 0; j < length; j++){#>
@@ -94,14 +71,9 @@ namespace FixedLengthArray
 					default: throw new ArgumentOutOfRangeException(nameof(index));
                 }
             }
-#else
-            readonly get => (index < ConstLength) ? Unsafe.Add(ref Unsafe.AsRef(in Field0), index) :
-                    throw new ArgumentOutOfRangeException(nameof(index));
-            set => Unsafe.Add(ref Field0, index) = (index < ConstLength) ? value :
-                    throw new ArgumentOutOfRangeException(nameof(index));
 #endif
         }
-#if GENERATE_ASSPAN || GENERATE_ALL_FIELDS
+#if GENERATE_ASSPAN
         public readonly override bool Equals(object other)
 			=> other is <#=generatedTypeName#> array
 				? FixedLengthArrayExtension.Equals(in this, array)
@@ -159,7 +131,7 @@ namespace FixedLengthArray
             => self.AsReadOnlySpan();
 #endif
 	}
-
+	
     public static partial class FixedLengthArrayExtension
     {
 #if GENERATE_ASSPAN
@@ -177,19 +149,12 @@ namespace FixedLengthArray
         public static ref <#=elementType#> At(this ref <#=generatedTypeName#> array, int index)
             => ref AsSpan(ref array)[index];
 
-        public static int CompareTo(this in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
-			=> AsReadOnlySpan(array1).SequenceCompareTo(AsReadOnlySpan(array2));
-
         public static void CopyTo(this in <#=generatedTypeName#> array, Span<<#=elementType#>> destination)
             => AsReadOnlySpan(array).CopyTo(destination);
 
-        public static bool Equals(in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
-			=> AsReadOnlySpan(array1).SequenceEqual(AsReadOnlySpan(array2));
-
         public static void Fill(this ref <#=generatedTypeName#> array, <#=elementType#> value = default)
             => AsSpan(ref array).Fill(value);
-
-#elif GENERATE_ALL_FIELDS 
+#else
         public static ref <#=elementType#> At(this ref <#=generatedTypeName#> array, int index)
         {
             switch (index)
@@ -200,28 +165,6 @@ namespace FixedLengthArray
 				default: throw new ArgumentOutOfRangeException(nameof(index));
             }
         }
-
-        public static int CompareTo(this in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
-		{
-			for(int i = 0; i < array1.Length;i++ )
-			{
-				int result = array1[i].CompareTo(array2[i]);
-				if(result != 0)
-					return result;
-			}
-			return 0;
-		}
-
-        public static bool Equals(in <#=generatedTypeName#> array1, in <#=generatedTypeName#> array2)
-		{
-			for(int i = 0; i < array1.Length;i++ )
-			{
-				if(array1[i] != array2[i])
-					return false;
-			}
-			return true;
-		}
-
         public static void Fill(this ref <#=generatedTypeName#> array, <#=elementType#> value = default)
         {
 			for(int i = 0; i < array.Length;i++ )
